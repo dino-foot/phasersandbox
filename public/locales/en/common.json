@@ -1,0 +1,26 @@
+{
+  "signInToYourAccount": "Sign in to your account",
+  "login": "Login",
+  "password": "Password",
+  "rememberMe": "Remember me",
+  "forgotPassword": "Forgot password?",
+  "notAMemberYet": "Not a member yet? ",
+  "signUp": "Sign up",
+  "changeGame": "Change game",
+  "openMyTables": "Open my tables",
+  "triplete": "Triplete",
+  "firstPool": "Primo mato",
+  "tournament": "Tournament",
+  "sitAndGo": "Sit & Go",
+  "club": "Club",
+  "search": "Search",
+  "gameClose": {
+    "gameFinished": "{{gameId}} game finished"
+  },
+  "finishGame": "{{gameId}} game finished! Your position is {{position}}",
+  "ok": "OK",
+  "dialogs": {
+    "gameClose": "Game closed",
+    "FinishGame": "Game finished"
+  }
+}
