@@ -11,7 +11,10 @@ export interface LoadSettings {
 }
 
 export const LoadSettings: LoadSettings = {
-  images: [{ key: 'bg', path: `${imagesPath}/ui` }],
+  images: [
+    { key: 'bg', path: `${imagesPath}/ui` },
+    { key: 'card-back', path: `${imagesPath}/scopaCards` },
+  ],
 
   spritesheets: [],
   audios: [],

@@ -3,6 +3,7 @@ import { EventsController } from '../controllers/eventsController';
 import { Card } from '../objects';
 
 export class Game extends Phaser.Scene {
+  deck: Card[] = [];
   constructor() {
     super('game');
   }
@@ -17,7 +18,13 @@ export class Game extends Phaser.Scene {
     // this.add.image(200, 200, '1c');
     // this.add.image(300, 200, '1d');
 
-    const card = new Card(this, 100, 300, '1d');
+    for (let i = 0; i < 52; i++) {
+      let card = new Card(this, 100, 100, '1d');
+      card.close();
+      this.deck.push(card);
+    }
+
+    // const card = new Card(this, 100, 100, '1d');
   }
 
   update() {}
