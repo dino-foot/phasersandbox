@@ -1,15 +1,35 @@
 import Phaser from 'phaser'
+import _ from 'lodash';
 import { EventsController } from '../controllers/eventsController';
 import { Card } from '../objects';
 
 export class Game extends Phaser.Scene {
   deck: Card[] = [];
+  centerX: number;
+  centerY: number;
+  player1: Phaser.GameObjects.Image;
+  player2: Phaser.GameObjects.Image;
   constructor() {
     super('game');
   }
 
   init() {
     // EventsController.onResume(this.handResumeFocus);
+    this.centerX = this.cameras.main.centerX;
+    this.centerY = this.cameras.main.centerY;
+
+    // todo refactor in a player class
+    this.player1 = this.add
+      .image(this.centerX, this.centerY - 250, 'avatar1')
+      .setOrigin(0.5)
+      .setScale(0.5)
+      .setDepth(1);
+
+    this.player2 = this.add
+      .image(this.centerX, this.centerY + 250, 'avatar2')
+      .setOrigin(0.5)
+      .setScale(0.5)
+      .setDepth(1);
   }
 
   create() {
@@ -18,13 +38,48 @@ export class Game extends Phaser.Scene {
     // this.add.image(200, 200, '1c');
     // this.add.image(300, 200, '1d');
 
-    for (let i = 0; i < 52; i++) {
-      let card = new Card(this, 100, 100, '1d');
+    //? create deck
+    const offset = 0.25;
+
+    for (let i = 0; i < 40; i++) {
+      let card = new Card(this, 100 + offset * i, this.centerY + offset * i, '1d');
       card.close();
       this.deck.push(card);
     }
 
-    // const card = new Card(this, 100, 100, '1d');
+    //! 4 cards shuffle event
+    const cardsList: Card[] = _.sampleSize(this.deck, 4);
+    // cards close >
+    // stagger delay > position
+    // card show > shine fx
+    // sound fx
+    const tweenChain = this.tweens.chain({
+      tweens: [
+        {
+          targets: cardsList,
+          x: this.player2.x,
+          y: this.player2.y - 120,
+          duration: 400,
+          delay: this.tweens.stagger(100, { start: 0 }),
+          ease: Phaser.Math.Easing.Sine.Out,
+        },
+      ],
+      repeat: 0,
+      onComplete: () => {
+        _.forEach(cardsList, (card: Card) => {
+          card.show();
+        });
+      },
+    });
+
+    // Phaser.Actions.GridAlign(cardsList, {
+    //   width: 8,
+    //   height: 2,
+    //   cellWidth: 80,
+    //   cellHeight: 220,
+    //   x: this.player1.x,
+    //   y: this.player2.y - 120,
+    // });
   }
 
   update() {}
