@@ -1,4 +1,4 @@
-import Phaser from 'phaser'
+import Phaser from 'phaser';
 import _ from 'lodash';
 import { EventsController } from '../controllers/eventsController';
 import { Card } from '../objects';
@@ -51,35 +51,28 @@ export class Game extends Phaser.Scene {
     const cardsList: Card[] = _.sampleSize(this.deck, 4);
     // cards close >
     // stagger delay > position
-    // card show > shine fx
+    // card show > flip effect > shine fx
     // sound fx
+    const baseX = this.player2.x - 100;
     const tweenChain = this.tweens.chain({
       tweens: [
         {
           targets: cardsList,
-          x: this.player2.x,
+          x: (a, b, c, d) => baseX + 75 * d,
           y: this.player2.y - 120,
           duration: 400,
           delay: this.tweens.stagger(100, { start: 0 }),
           ease: Phaser.Math.Easing.Sine.Out,
         },
       ],
+
       repeat: 0,
       onComplete: () => {
         _.forEach(cardsList, (card: Card) => {
-          card.show();
+          // card.show();
         });
       },
     });
-
-    // Phaser.Actions.GridAlign(cardsList, {
-    //   width: 8,
-    //   height: 2,
-    //   cellWidth: 80,
-    //   cellHeight: 220,
-    //   x: this.player1.x,
-    //   y: this.player2.y - 120,
-    // });
   }
 
   update() {}

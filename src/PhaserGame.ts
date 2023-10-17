@@ -11,7 +11,7 @@ const config: Phaser.Types.Core.GameConfig = {
   pixelArt: true,
   antialias: true,
   scale: {
-    mode: Phaser.Scale.ScaleModes.FIT,
+    mode: Phaser.Scale.ScaleModes.RESIZE,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
   scene: [Bootstrap, Game],
