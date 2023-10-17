@@ -27,7 +27,7 @@ export class Bootstrap extends Phaser.Scene {
   }
 
   watchProgress(progress) {
-    console.log(`Loading ... ${progress.toFixed(2)}`);
+    // console.log(`Loading ... ${progress.toFixed(2)}`);
     // this.loadingText.setText(`Loading ... ${progress.toFixed(2)}`);
   }
 
