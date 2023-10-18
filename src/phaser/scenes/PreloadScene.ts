@@ -1,6 +1,7 @@
 import Phaser from 'phaser'
 import { EventsController } from '../controllers/eventsController';
 import { LoadSettings } from '../settings/LoadSettings';
+import { scopaDeck } from '../constants';
 export class Bootstrap extends Phaser.Scene {
   constructor() {
     super('preload');
@@ -24,6 +25,11 @@ export class Bootstrap extends Phaser.Scene {
     LoadSettings.images.forEach((image) => {
       this.load.image(image.key, `${image.path}/${image.key}.png`);
     });
+
+    // load cards
+    for (let value of scopaDeck) {
+      this.load.image(value, `/assets/scopaCards/${value}.png`);
+    }
   }
 
   watchProgress(progress) {

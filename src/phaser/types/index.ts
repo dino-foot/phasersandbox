@@ -3,6 +3,11 @@ export interface ImageLoadConfig {
     path: string;
 }
 
+export interface vector2 {
+  x: number;
+  y: number;
+}
+
 export interface AudioLoadConfig {
     key: string;
     volume: number;

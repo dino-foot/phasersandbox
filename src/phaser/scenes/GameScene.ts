@@ -2,6 +2,8 @@ import Phaser from 'phaser';
 import _ from 'lodash';
 import { EventsController } from '../controllers/eventsController';
 import { Card } from '../objects';
+import { distributeCards } from '../helpers';
+import { scopaDeck } from '../constants';
 
 export class Game extends Phaser.Scene {
   deck: Card[] = [];
@@ -34,45 +36,22 @@ export class Game extends Phaser.Scene {
 
   create() {
     this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'bg').setOrigin(0.5);
-    // this.add.image(100, 200, '1b');
-    // this.add.image(200, 200, '1c');
-    // this.add.image(300, 200, '1d');
 
     //? create deck
     const offset = 0.25;
 
-    for (let i = 0; i < 40; i++) {
-      let card = new Card(this, 100 + offset * i, this.centerY + offset * i, '1d');
+    for (let i = 0; i < scopaDeck.length; i++) {
+      let card = new Card(this, 100 + offset * i, this.centerY + offset * i, scopaDeck[i]);
       card.close();
       this.deck.push(card);
     }
 
-    //! 4 cards shuffle event
-    const cardsList: Card[] = _.sampleSize(this.deck, 4);
-    // cards close >
-    // stagger delay > position
-    // card show > flip effect > shine fx
-    // sound fx
-    const baseX = this.player2.x - 100;
-    const tweenChain = this.tweens.chain({
-      tweens: [
-        {
-          targets: cardsList,
-          x: (a, b, c, d) => baseX + 75 * d,
-          y: this.player2.y - 120,
-          duration: 400,
-          delay: this.tweens.stagger(100, { start: 0 }),
-          ease: Phaser.Math.Easing.Sine.Out,
-        },
-      ],
+    //? 4 card distribute
+    const playerCards: Card[] = _.sampleSize(this.deck, 4);
+    const aiCards: Card[] = _.sampleSize(this.deck, 4);
 
-      repeat: 0,
-      onComplete: () => {
-        _.forEach(cardsList, (card: Card) => {
-          // card.show();
-        });
-      },
-    });
+    distributeCards(this, playerCards, { x: this.player2.x - 100, y: this.player2.y - 120 });
+    distributeCards(this, aiCards, { x: this.player1.x - 100, y: this.player1.y + 120 });
   }
 
   update() {}
