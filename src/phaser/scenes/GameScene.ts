@@ -48,10 +48,19 @@ export class Game extends Phaser.Scene {
 
     //? 4 card distribute
     const playerCards: Card[] = _.sampleSize(this.deck, 4);
+    this.updateDeck(playerCards);
     const aiCards: Card[] = _.sampleSize(this.deck, 4);
+    this.updateDeck(aiCards);
+
+    console.log(`player card ${playerCards.length} ai ${aiCards.length}`);
 
     distributeCards(this, playerCards, { x: this.player2.x - 100, y: this.player2.y - 120 });
     distributeCards(this, aiCards, { x: this.player1.x - 100, y: this.player1.y + 120 });
+  }
+
+  updateDeck(subset: Card[]) {
+    this.deck = _.differenceWith(this.deck, subset, (deckCard, subsetCard) => deckCard.cardValue === subsetCard.cardValue);
+    // console.log('Updated Deck:', this.deck.length);
   }
 
   update() {}

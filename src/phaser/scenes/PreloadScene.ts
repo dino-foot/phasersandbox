@@ -10,9 +10,6 @@ export class Bootstrap extends Phaser.Scene {
   init() {
     // init all the controllers here
     EventsController.init(this);
-    // this.loadingText = PhaserHelpers.addText(LoadSettings.loadingText, this);
-
-    // this.loadingText = PhaserHelpers.addText(LoadSettings.loadingText, this);
     this.load.on('complete', this.lunchGame, this);
     this.load.on('progress', this.watchProgress, this);
   }
@@ -34,7 +31,6 @@ export class Bootstrap extends Phaser.Scene {
 
   watchProgress(progress) {
     // console.log(`Loading ... ${progress.toFixed(2)}`);
-    // this.loadingText.setText(`Loading ... ${progress.toFixed(2)}`);
   }
 
   private lunchGame() {
