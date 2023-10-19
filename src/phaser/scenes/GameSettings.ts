@@ -7,19 +7,17 @@ interface GameSettingsInterface {
 export const GameSettings: GameSettingsInterface = {
   RESET: {
     text: 'RESET',
-    x: 300,
-    y: 100,
+    x: 200,
+    y: 50,
     origin: {
       x: 0.5,
       y: 0.5,
     },
     style: {
-      fontSize: 32,
+      fontSize: 24,
       color: '#ffffff',
-      fontFamily: 'Roboto-Regular',
-      stroke: '#ffa500',
-      strokeThickness: 2,
     },
     depth: 2,
+    isInterActive: true,
   },
 };

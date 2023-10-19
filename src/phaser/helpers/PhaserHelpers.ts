@@ -43,7 +43,7 @@ export class PhaserHelpers {
   }
 
   static addText(textData: TextObject, context: Phaser.Scene): Phaser.GameObjects.Text {
-    const { x, y, text, style, origin, angle, wordWrapWidth, lineHeight, depth } = textData;
+    const { x, y, text, style, origin, angle, wordWrapWidth, lineHeight, depth, isInterActive } = textData;
 
     const textStyle = style || null;
     const textObject = context.add.text(x || 0, y || 0, text || '', textStyle);
@@ -51,6 +51,7 @@ export class PhaserHelpers {
     if (angle != null) textObject.angle = angle;
     if (wordWrapWidth != null) textObject.style.setWordWrapWidth(wordWrapWidth);
     if (lineHeight != null) textObject.setLineSpacing(lineHeight);
+    if (isInterActive != null) textObject.setInteractive();
     if (depth) textObject.depth = depth;
 
     return textObject;

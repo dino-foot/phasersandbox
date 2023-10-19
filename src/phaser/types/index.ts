@@ -44,6 +44,7 @@ export interface TextObject extends ItemData {
   style?: Phaser.Types.GameObjects.Text.TextStyle;
   wordWrapWidth?: number;
   lineHeight?: number;
+  isInterActive?: boolean;
 }
 
 export interface RectData extends ItemData {

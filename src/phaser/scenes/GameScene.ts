@@ -10,6 +10,10 @@ export class Game extends Phaser.Scene {
   deck: Card[] = [];
   centerX: number;
   centerY: number;
+  resetButton: Phaser.GameObjects.Text;
+  CardSuffle1_A: Phaser.GameObjects.Text;
+  CardSuffle1_B: Phaser.GameObjects.Text;
+  CardSuffle1_C: Phaser.GameObjects.Text;
   player: Phaser.GameObjects.Image;
   constructor() {
     super('game');
@@ -25,12 +29,12 @@ export class Game extends Phaser.Scene {
       .setOrigin(0.5)
       .setScale(0.5)
       .setDepth(1);
+
+    this.createUI();
   }
 
   create() {
     this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'bg').setOrigin(0.5);
-
-    const resetBtn = PhaserHelpers.addText(GameSettings.RESET, this);
 
     //? create deck
     this.resetDeck();
@@ -39,6 +43,10 @@ export class Game extends Phaser.Scene {
     const playerCards: Card[] = _.sampleSize(this.deck, 4);
     this.updateDeck(playerCards);
     distributeCards(this, playerCards, { x: this.player.x - 100, y: this.player.y - 120 });
+  }
+
+  createUI() {
+    this.resetButton = PhaserHelpers.addText(GameSettings.RESET, this);
   }
 
   updateDeck(subset: Card[]) {
