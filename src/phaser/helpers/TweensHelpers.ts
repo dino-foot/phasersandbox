@@ -19,12 +19,10 @@ export const distributeCards = (context: Phaser.Scene, cardList: Card[], pos: ve
         props: {
           scaleX: { value: 0, duration: 200, yoyo: true },
         },
-        ease: Phaser.Math.Easing.Linear,
-        onComplete: (tween: Phaser.Tweens.Tween, targets: Card[]) => {
-          _.forEach(targets, (item: Card) => {
-            item.setTexture(item.cardValue);
-          });
+        onYoyo: (tween: Phaser.Tweens.Tween, target: Card) => {
+          target.setTexture(target.cardValue);
         },
+        ease: Phaser.Math.Easing.Linear,
       },
     ],
     paused: false,
