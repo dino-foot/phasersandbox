@@ -1,13 +1,13 @@
-import { ImageLoadConfig, TextConfig } from "../types";
+import { ImageLoadConfig, TextObject } from '../types';
 
 const imagesPath: string = '/assets';
 const audiosPath: string = '';
 
 export interface LoadSettings {
-    images: ImageLoadConfig[];
-    spritesheets: ImageLoadConfig[]; // You can replace 'any' with a specific type if needed
-    audios: any[]; // You can replace 'any' with a specific type if needed
-    loadingText: TextConfig;
+  images: ImageLoadConfig[];
+  spritesheets: ImageLoadConfig[]; // You can replace 'any' with a specific type if needed
+  audios: any[]; // You can replace 'any' with a specific type if needed
+  loadingText: TextObject;
 }
 
 export const LoadSettings: LoadSettings = {
@@ -25,7 +25,7 @@ export const LoadSettings: LoadSettings = {
     x: 400,
     y: 400,
     origin: { x: 0.5, y: 0.5 },
-    style: { fontSize: 50, color: 0xefc53f, fontFamily: 'Roboto-Medium', stroke: 'white', strokeThickness: 4 },
+    style: { fontSize: 50, color: '#ffffff', fontFamily: 'Roboto-Medium', stroke: '#ffffff', strokeThickness: 4 },
     depth: 4,
   },
 };

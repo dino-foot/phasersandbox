@@ -14,45 +14,36 @@ export interface AudioLoadConfig {
     path: string;
 }
 
-export interface TextConfig {
-    text: string;
-    x: number;
-    y: number;
-    origin: { x: number; y: number };
-    style: { fontSize: number; color: number; fontFamily: string; stroke: string; strokeThickness: number };
-    depth: number;
-}
-
 export interface ItemBase {
-    x: number;
-    y: number;
-    texture: string;
-    name?: string;
-    scale?: { scaleX: number; scaleY: number };
-    origin?: { x: number; y: number };
-    offset?: { x: number; y: number };
+  x: number;
+  y: number;
+  texture?: string;
+  name?: string;
+  scale?: { scaleX: number; scaleY: number };
+  origin?: { x: number; y: number };
+  offset?: { x: number; y: number };
 }
 
 export interface ItemData extends ItemBase {
-    align?: 'center' | 'left' | 'right';
-    frame?: string;
-    flipX?: boolean;
-    flipY?: boolean;
-    depth?: number;
-    scrollFactor?: number;
-    angle?: number;
-    color?: number;
-    radius?: number;
-    alpha?: number;
-    stroke?: number;
-    strokeColor?: number;
+  align?: 'center' | 'left' | 'right';
+  frame?: string;
+  flipX?: boolean;
+  flipY?: boolean;
+  depth?: number;
+  scrollFactor?: number;
+  angle?: number;
+  color?: number;
+  radius?: number;
+  alpha?: number;
+  stroke?: number;
+  strokeColor?: number;
 }
 
-export interface TextData extends ItemData {
-    text: string;
-    style?: Phaser.Types.GameObjects.Text.TextStyle;
-    wordWrapWidth?: number;
-    lineHeight?: number;
+export interface TextObject extends ItemData {
+  text: string;
+  style?: Phaser.Types.GameObjects.Text.TextStyle;
+  wordWrapWidth?: number;
+  lineHeight?: number;
 }
 
 export interface RectData extends ItemData {
