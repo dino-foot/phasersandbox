@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import _ from 'lodash';
 import { Card } from '../objects';
-import { PhaserHelpers, distributeCards } from '../helpers';
+import { PhaserHelpers, shuffle_A } from '../helpers';
 import { scopaDeck } from '../constants';
 import { GameSettings } from './GameSettings';
 
@@ -37,7 +37,7 @@ export class Game extends Phaser.Scene {
     this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'bg').setOrigin(0.5);
 
     //? create deck
-    this.resetDeck();
+    this.createDeck();
 
     // todo
     // - reset button
@@ -55,9 +55,9 @@ export class Game extends Phaser.Scene {
     // settabello win fx
 
     //? 4 card distribute
-    const playerCards: Card[] = _.sampleSize(this.deck, 4);
-    this.updateDeck(playerCards);
-    distributeCards(this, playerCards, { x: this.player.x - 100, y: this.player.y - 120 });
+    // const playerCards: Card[] = _.sampleSize(this.deck, 4);
+    // this.updateDeck(playerCards);
+    shuffle_A(this, _.sampleSize(this.deck, 4), { x: this.player.x - 100, y: this.player.y - 120 });
   }
 
   createUI() {
@@ -82,10 +82,16 @@ export class Game extends Phaser.Scene {
   }
 
   handleUIEvents(type: string) {
-    console.log(type);
+    if (type === 'RESET') {
+      this.deck.forEach((card: Card) => {
+        card.destroy();
+      });
+      this.createDeck();
+    }
+    // console.log(type);
   }
 
-  resetDeck() {
+  createDeck() {
     this.deck = [];
     const offset = 0.25;
     for (let i = 0; i < scopaDeck.length; i++) {

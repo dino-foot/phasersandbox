@@ -3,7 +3,7 @@ import { Card } from '../objects';
 import { vector2 } from '../types';
 import _ from 'lodash';
 
-export const distributeCards = (context: Phaser.Scene, cardList: Card[], pos: vector2, completeCallback?: any): Phaser.Tweens.TweenChain => {
+export const shuffle_A = (context: Phaser.Scene, cardList: Card[], pos: vector2, completeCallback?: any): Phaser.Tweens.TweenChain => {
   const tweenChain: Phaser.Tweens.TweenChain = context.tweens.chain({
     tweens: [
       {
