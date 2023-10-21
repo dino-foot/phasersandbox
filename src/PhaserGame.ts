@@ -8,7 +8,7 @@ const config: Phaser.Types.Core.GameConfig = {
   height: '100%',
   parent: 'phaser-container',
   backgroundColor: '#282c34',
-  pixelArt: true,
+  pixelArt: false,
   antialias: true,
   scale: {
     mode: Phaser.Scale.ScaleModes.RESIZE,

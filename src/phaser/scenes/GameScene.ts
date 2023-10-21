@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import _ from 'lodash';
 import { Card } from '../objects';
-import { PhaserHelpers, shuffle_A } from '../helpers';
+import { PhaserHelpers, glowCards, shineCards, shuffleCards_A } from '../helpers';
 import { scopaDeck } from '../constants';
 import { GameSettings } from './GameSettings';
 
@@ -48,8 +48,6 @@ export class Game extends Phaser.Scene {
     // card selection effect
     // card place/show tween
     // card match tween (placed 1 card, matched with 2 card)
-    // card shine fx
-    // card glow fx
     // card match fx
     // scopa win fx
     // settabello win fx
@@ -57,7 +55,7 @@ export class Game extends Phaser.Scene {
     //? 4 card distribute
     // const playerCards: Card[] = _.sampleSize(this.deck, 4);
     // this.updateDeck(playerCards);
-    shuffle_A(this, _.sampleSize(this.deck, 4), { x: this.player.x - 100, y: this.player.y - 120 });
+    // shuffle_A(this, _.sampleSize(this.deck, 4), { x: this.player.x - 100, y: this.player.y - 120 });
   }
 
   createUI() {
@@ -74,6 +72,30 @@ export class Game extends Phaser.Scene {
       },
       this
     );
+
+    this.shuffleABtn.on(
+      'pointerdown',
+      () => {
+        this.handleUIEvents('SHUFFLE_A');
+      },
+      this
+    );
+
+    this.shineFXBtn.on(
+      'pointerdown',
+      () => {
+        this.handleUIEvents('SHINE_CARDS');
+      },
+      this
+    );
+
+    this.glowFXBtn.on(
+      'pointerdown',
+      () => {
+        this.handleUIEvents('GLOW_CARDS');
+      },
+      this
+    );
   }
 
   updateDeck(subset: Card[]) {
@@ -81,12 +103,43 @@ export class Game extends Phaser.Scene {
     // console.log('Updated Deck:', this.deck.length);
   }
 
-  handleUIEvents(type: string) {
-    if (type === 'RESET') {
-      this.deck.forEach((card: Card) => {
-        card.destroy();
-      });
-      this.createDeck();
+  handleUIEvents(type: 'RESET' | 'SHUFFLE_A' | 'SHINE_CARDS' | 'GLOW_CARDS') {
+    let cardList;
+
+    switch (type) {
+      case 'RESET':
+        this.deck.forEach((card: Card) => {
+          card.destroy();
+        });
+        this.createDeck();
+        break;
+
+      case 'SHUFFLE_A':
+        if (this.deck.length < 0) this.createDeck();
+
+        shuffleCards_A(this, _.sampleSize(this.deck, 4), { x: this.player.x - 100, y: this.player.y - 120 });
+        break;
+
+      case 'SHINE_CARDS':
+        if (this.deck.length < 0) this.createDeck();
+
+        cardList = _.sampleSize(this.deck, 4);
+        shuffleCards_A(this, cardList, { x: this.player.x - 100, y: this.player.y - 120 }, () => {
+          shineCards(this, cardList);
+        });
+        break;
+
+      case 'GLOW_CARDS':
+        if (this.deck.length < 0) this.createDeck();
+        cardList = _.sampleSize(this.deck, 4);
+        shuffleCards_A(this, cardList, { x: this.player.x - 100, y: this.player.y - 120 }, () => {
+          glowCards(this, [cardList[2]], 0xffff00);
+        });
+        break;
+
+      default:
+        // Handle default case if necessary
+        break;
     }
     // console.log(type);
   }
