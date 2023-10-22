@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import _ from 'lodash';
 import { Card } from '../objects';
-import { PhaserHelpers, glowCards, shineCards, shuffleCards_A } from '../helpers';
+import { PhaserHelpers, glowCards, matchCards_A, shineCards, shuffleCards_A } from '../helpers';
 import { scopaDeck } from '../constants';
 import { GameSettings } from './GameSettings';
 
@@ -14,6 +14,7 @@ export class Game extends Phaser.Scene {
   glowFXBtn: Phaser.GameObjects.Text;
   shineFXBtn: Phaser.GameObjects.Text;
   scopaFXBtn: Phaser.GameObjects.Text;
+  cardMathBtn: Phaser.GameObjects.Text;
   player: Phaser.GameObjects.Image;
   constructor() {
     super('game');
@@ -51,11 +52,6 @@ export class Game extends Phaser.Scene {
     // card match fx
     // scopa win fx
     // settabello win fx
-
-    //? 4 card distribute
-    // const playerCards: Card[] = _.sampleSize(this.deck, 4);
-    // this.updateDeck(playerCards);
-    // shuffle_A(this, _.sampleSize(this.deck, 4), { x: this.player.x - 100, y: this.player.y - 120 });
   }
 
   createUI() {
@@ -64,6 +60,7 @@ export class Game extends Phaser.Scene {
     this.glowFXBtn = PhaserHelpers.addText(GameSettings.GLOW, this);
     this.shuffleABtn = PhaserHelpers.addText(GameSettings.SHUFFLE_A, this);
     this.scopaFXBtn = PhaserHelpers.addText(GameSettings.SCOPA_FX, this);
+    this.cardMathBtn = PhaserHelpers.addText(GameSettings.CARD_MATCH, this);
 
     this.resetButton.on(
       'pointerdown',
@@ -96,6 +93,14 @@ export class Game extends Phaser.Scene {
       },
       this
     );
+
+    this.cardMathBtn.on(
+      'pointerdown',
+      () => {
+        this.handleUIEvents('CARD_MATCH');
+      },
+      this
+    );
   }
 
   updateDeck(subset: Card[]) {
@@ -103,7 +108,7 @@ export class Game extends Phaser.Scene {
     // console.log('Updated Deck:', this.deck.length);
   }
 
-  handleUIEvents(type: 'RESET' | 'SHUFFLE_A' | 'SHINE_CARDS' | 'GLOW_CARDS') {
+  handleUIEvents(type: 'RESET' | 'SHUFFLE_A' | 'SHINE_CARDS' | 'GLOW_CARDS' | 'CARD_MATCH') {
     let cardList;
 
     switch (type) {
@@ -133,11 +138,24 @@ export class Game extends Phaser.Scene {
         if (this.deck.length < 0) this.createDeck();
         cardList = _.sampleSize(this.deck, 4);
         shuffleCards_A(this, cardList, { x: this.player.x - 100, y: this.player.y - 120 }, () => {
-          glowCards(this, [cardList[2]], 0xffff00);
+          glowCards(this, [cardList[2]]);
         });
         break;
 
-      default:
+      case 'CARD_MATCH':
+        if (this.deck.length < 0) this.createDeck();
+
+        // setup demo scenario
+        this.deck[0].setPosition(400, 300).show(); // target 
+        this.deck[1].setPosition(500, 300).show();
+        this.deck[2].setPosition(600, 300).show(); // matched 
+        this.deck[3].setPosition(700, 300).show(); // matched 
+
+        glowCards(this, [this.deck[0]], 0xffc400, 350, 1);
+        glowCards(this, [this.deck[1], this.deck[3]], 0xffff00, 350, 1, () => {
+          matchCards_A(this, this.deck[0], [this.deck[1], this.deck[3]], { x: 100, y: this.centerY });
+        });
+      // matchCards_A(this, [this.deck[0]], [this.deck[1], this.deck[3]]);
         // Handle default case if necessary
         break;
     }
@@ -154,5 +172,5 @@ export class Game extends Phaser.Scene {
     }
   }
 
-  update() {}
+  update() { }
 }
