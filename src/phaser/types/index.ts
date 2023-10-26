@@ -3,6 +3,15 @@ export interface ImageLoadConfig {
     path: string;
 }
 
+export interface SpritesheetLoadConfig {
+  key: string;
+  path: string;
+  frameConfig: {
+    frameWidth: number;
+    frameHeight: number;
+  };
+}
+
 export interface vector2 {
   x: number;
   y: number;

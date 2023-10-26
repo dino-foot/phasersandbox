@@ -1,11 +1,11 @@
-import { ImageLoadConfig, TextObject } from '../types';
+import { ImageLoadConfig, SpritesheetLoadConfig, TextObject } from '../types';
 
 const imagesPath: string = '/assets';
 const audiosPath: string = '';
 
 export interface LoadSettings {
   images: ImageLoadConfig[];
-  spritesheets: ImageLoadConfig[]; // You can replace 'any' with a specific type if needed
+  spritesheets: SpritesheetLoadConfig[]; // You can replace 'any' with a specific type if needed
   audios: any[]; // You can replace 'any' with a specific type if needed
   loadingText: TextObject;
 }
@@ -18,7 +18,7 @@ export const LoadSettings: LoadSettings = {
     { key: 'avatar2', path: `${imagesPath}/ui` },
   ],
 
-  spritesheets: [],
+  spritesheets: [{ key: 'confetti', path: `${imagesPath}/effects`, frameConfig: { frameWidth: 32, frameHeight: 32 } }],
   audios: [],
   loadingText: {
     text: 'Loading...',

@@ -5,7 +5,7 @@ interface GameSettingsInterface {
   GLOW: TextObject;
   SHINE: TextObject;
   SCOPA_FX: TextObject;
-  SHUFFLE_A: TextObject;
+  DEAL_CARDS: TextObject;
   CARD_MATCH: TextObject;
 }
 
@@ -78,8 +78,8 @@ export const GameSettings: GameSettingsInterface = {
     isInterActive: true,
   },
 
-  SHUFFLE_A: {
-    text: 'SHUFFLE_A',
+  DEAL_CARDS: {
+    text: 'DEAL CARDS',
     x: 500,
     y: 50,
     origin: {
@@ -97,7 +97,7 @@ export const GameSettings: GameSettingsInterface = {
 
   CARD_MATCH: {
     text: 'CARD_MATCH',
-    x: 600,
+    x: 620,
     y: 50,
     origin: {
       x: 0.5,

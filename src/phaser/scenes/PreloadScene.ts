@@ -23,6 +23,10 @@ export class Bootstrap extends Phaser.Scene {
       this.load.image(image.key, `${image.path}/${image.key}.png`);
     });
 
+    LoadSettings.spritesheets.forEach((sprite) => {
+      this.load.spritesheet(sprite.key, `${sprite.path}/${sprite.key}.png`, sprite.frameConfig);
+    });
+
     // load cards
     for (let value of scopaDeck) {
       this.load.image(value, `/assets/scopaCards/${value}.png`);
