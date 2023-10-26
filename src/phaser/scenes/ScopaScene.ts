@@ -5,7 +5,7 @@ import { PhaserHelpers, glowCards, matchCards_A, shineCards, shuffleCards_A } fr
 import { scopaDeck } from '../constants';
 import { GameSettings } from './GameSettings';
 
-export class Game extends Phaser.Scene {
+export class ScopaScene extends Phaser.Scene {
   deck: Card[] = [];
   centerX: number;
   centerY: number;
@@ -17,7 +17,7 @@ export class Game extends Phaser.Scene {
   cardMathBtn: Phaser.GameObjects.Text;
   player: Phaser.GameObjects.Image;
   constructor() {
-    super('game');
+    super('scopa');
   }
 
   init() {
@@ -146,16 +146,16 @@ export class Game extends Phaser.Scene {
         if (this.deck.length < 0) this.createDeck();
 
         // setup demo scenario
-        this.deck[0].setPosition(400, 300).show(); // target 
+        this.deck[0].setPosition(400, 300).show(); // target
         this.deck[1].setPosition(500, 300).show();
-        this.deck[2].setPosition(600, 300).show(); // matched 
-        this.deck[3].setPosition(700, 300).show(); // matched 
+        this.deck[2].setPosition(600, 300).show(); // matched
+        this.deck[3].setPosition(700, 300).show(); // matched
 
         glowCards(this, [this.deck[0]], 0xffc400, 350, 1);
         glowCards(this, [this.deck[1], this.deck[3]], 0xffff00, 350, 1, () => {
           matchCards_A(this, this.deck[0], [this.deck[1], this.deck[3]], { x: 100, y: this.centerY });
         });
-      // matchCards_A(this, [this.deck[0]], [this.deck[1], this.deck[3]]);
+        // matchCards_A(this, [this.deck[0]], [this.deck[1], this.deck[3]]);
         // Handle default case if necessary
         break;
     }
@@ -172,5 +172,5 @@ export class Game extends Phaser.Scene {
     }
   }
 
-  update() { }
+  update() {}
 }
