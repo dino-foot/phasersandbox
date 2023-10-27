@@ -1,4 +1,7 @@
 .App {
   text-align: center;
   display: flex;
+  background-color: aquamarine;
+  width: auto;
+  height: auto;
 }

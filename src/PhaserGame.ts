@@ -17,5 +17,5 @@ const config: Phaser.Types.Core.GameConfig = {
   scene: [PreloadScene, ScopaScene, OkeyScene],
 };
 
-// eslint-disable-next-line import/no-anonymous-default-export
-export default new Phaser.Game(config)
+// export default new Phaser.Game(config);
+export default config;
