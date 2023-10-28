@@ -1,5 +1,5 @@
-import Phaser from "phaser";
-import { ImageButtonConfig } from "../types";
+import Phaser from 'phaser';
+import { ImageButtonConfig } from '../types';
 
 export class ImageButton extends Phaser.GameObjects.Image {
     private config: ImageButtonConfig;
@@ -20,7 +20,7 @@ export class ImageButton extends Phaser.GameObjects.Image {
         this.hitRect = config.hitArea
             ? new Phaser.Geom.Rectangle(config.hitArea.x, config.hitArea.y, config.hitArea.width, config.hitArea.height)
             : null;
-        this.id = config.id || "";
+        this.id = config.id || '';
         this.text = null;
 
         if (config.angle !== undefined) {
@@ -182,13 +182,14 @@ export class ImageButton extends Phaser.GameObjects.Image {
     }
 
     tweenTo(newX: number, newY: number, duration: number, ease: string = 'linear'): void {
-        let targets: any[] = [this];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const targets: any[] = [this];
         if (this.text) {
             targets.push(this.text);
         }
-        let xDiff: number = newX - this.x;
-        let yDiff: number = newY - this.y;
-        let tween: Phaser.Tweens.Tween = this.scene.tweens.add({
+        const xDiff: number = newX - this.x;
+        const yDiff: number = newY - this.y;
+        const tween: Phaser.Tweens.Tween = this.scene.tweens.add({
             targets: targets,
             x: '+=' + xDiff,
             y: '+=' + yDiff,

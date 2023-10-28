@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Phaser from 'phaser';
 import { Card } from '../objects';
 import { vector2 } from '../types';
