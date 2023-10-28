@@ -1,4 +1,4 @@
-import Phaser from 'phaser'
+import Phaser from 'phaser';
 import { EventsController } from '../controllers/eventsController';
 import { LoadSettings } from '../settings/LoadSettings';
 import { scopaDeck } from '../constants';
@@ -25,7 +25,7 @@ export class PreloadScene extends Phaser.Scene {
     });
 
     // load cards
-    for (let value of scopaDeck) {
+    for (const value of scopaDeck) {
       this.load.image(value, `/assets/scopaCards/${value}.png`);
     }
   }
@@ -35,6 +35,7 @@ export class PreloadScene extends Phaser.Scene {
   }
 
   private lunchGame() {
-    this.scene.launch('scopa');
+    const game: Phaser.Game = this.game;
+    this.scene.launch(game.scene.scenes[1]);
   }
 }
