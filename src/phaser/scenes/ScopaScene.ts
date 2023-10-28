@@ -16,7 +16,7 @@ export class ScopaScene extends Phaser.Scene {
   centerX: number;
   centerY: number;
   resetButton: Phaser.GameObjects.Text;
-  shuffleABtn: Phaser.GameObjects.Text;
+  dealCards: Phaser.GameObjects.Text;
   glowFXBtn: Phaser.GameObjects.Text;
   shineFXBtn: Phaser.GameObjects.Text;
   scopaFXBtn: Phaser.GameObjects.Text;
@@ -62,15 +62,14 @@ export class ScopaScene extends Phaser.Scene {
     this.resetButton = PhaserHelpers.addText(GameSettings.RESET, this);
     this.shineFXBtn = PhaserHelpers.addText(GameSettings.SHINE, this);
     this.glowFXBtn = PhaserHelpers.addText(GameSettings.GLOW, this);
-    this.shuffleABtn = PhaserHelpers.addText(GameSettings.SHUFFLE_A, this);
+    this.dealCards = PhaserHelpers.addText(GameSettings.DEAL_CARDS, this);
     this.scopaFXBtn = PhaserHelpers.addText(GameSettings.SCOPA_FX, this);
     this.cardMathBtn = PhaserHelpers.addText(GameSettings.CARD_MATCH, this);
 
     this.resetButton.on('pointerdown', () => { this.handleUIEvents('RESET'); }, this);
-    this.shuffleABtn.on('pointerdown', () => { this.handleUIEvents('SHUFFLE_A'); }, this);
-
+    this.dealCards.on('pointerdown', () => { this.handleUIEvents('DEAL CARDS'); }, this);
     this.shineFXBtn.on('pointerdown', () => { this.handleUIEvents('SHINE_CARDS'); }, this);
-    this.shineFXBtn.on('pointerdown', () => { this.handleUIEvents('SHINE_CARDS'); }, this);
+    this.glowFXBtn.on('pointerdown', () => { this.handleUIEvents('GLOW_CARDS'); }, this);
     this.cardMathBtn.on('pointerdown', () => { this.handleUIEvents('CARD_MATCH'); }, this);
 
   }
@@ -84,7 +83,7 @@ export class ScopaScene extends Phaser.Scene {
     // console.log('Updated Deck:', this.deck.length);
   }
 
-  handleUIEvents(type: 'RESET' | 'SHUFFLE_A' | 'SHINE_CARDS' | 'GLOW_CARDS' | 'CARD_MATCH') {
+  handleUIEvents(type: 'RESET' | 'DEAL CARDS' | 'SHINE_CARDS' | 'GLOW_CARDS' | 'CARD_MATCH') {
     let cardList;
 
     switch (type) {
@@ -95,7 +94,7 @@ export class ScopaScene extends Phaser.Scene {
         this.createDeck();
         break;
 
-      case 'SHUFFLE_A':
+      case 'DEAL CARDS':
         if (this.deck.length < 0) this.createDeck();
 
         shuffleCards_A(this, _.sampleSize(this.deck, 4), {
