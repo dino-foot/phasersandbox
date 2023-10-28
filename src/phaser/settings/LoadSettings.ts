@@ -1,11 +1,11 @@
-import { ImageLoadConfig, TextObject } from '../types';
+import { ImageLoadConfig, SpritesheetLoadConfig, TextObject } from '../types';
 
 const imagesPath: string = '/assets';
 const audiosPath: string = '';
 
 export interface LoadSettings {
   images: ImageLoadConfig[];
-  spritesheets: ImageLoadConfig[]; // You can replace 'any' with a specific type if needed
+  spritesheets: SpritesheetLoadConfig[]; // You can replace 'any' with a specific type if needed
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   audios: any[]; // You can replace 'any' with a specific type if needed
   loadingText: TextObject;
