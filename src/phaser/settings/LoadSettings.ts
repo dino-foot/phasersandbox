@@ -19,7 +19,9 @@ export const LoadSettings: LoadSettings = {
     { key: 'avatar2', path: `${imagesPath}/ui` },
   ],
 
-  spritesheets: [],
+  spritesheets: [
+    { key: 'confetti', path: `${imagesPath}/effects`, frameConfig: {frameWidth: 32, frameHeight: 32} }
+  ],
   audios: [],
   loadingText: {
     text: 'Loading...',
