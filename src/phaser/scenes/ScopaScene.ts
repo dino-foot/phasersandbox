@@ -3,6 +3,7 @@ import _ from 'lodash';
 import { Card } from '../objects';
 import {
   PhaserHelpers,
+  confettiEffects,
   glowCards,
   matchCards_A,
   shineCards,
@@ -70,6 +71,7 @@ export class ScopaScene extends Phaser.Scene {
     this.dealCards.on('pointerdown', () => { this.handleUIEvents('DEAL CARDS'); }, this);
     this.shineFXBtn.on('pointerdown', () => { this.handleUIEvents('SHINE_CARDS'); }, this);
     this.glowFXBtn.on('pointerdown', () => { this.handleUIEvents('GLOW_CARDS'); }, this);
+    this.scopaFXBtn.on('pointerdown', () => { this.handleUIEvents('SCOPA FX'); }, this);
     this.cardMathBtn.on('pointerdown', () => { this.handleUIEvents('CARD_MATCH'); }, this);
 
   }
@@ -83,7 +85,7 @@ export class ScopaScene extends Phaser.Scene {
     // console.log('Updated Deck:', this.deck.length);
   }
 
-  handleUIEvents(type: 'RESET' | 'DEAL CARDS' | 'SHINE_CARDS' | 'GLOW_CARDS' | 'CARD_MATCH') {
+  handleUIEvents(type: 'RESET' | 'DEAL CARDS' | 'SHINE_CARDS' | 'GLOW_CARDS' | 'CARD_MATCH' | 'SCOPA FX') {
     let cardList;
 
     switch (type) {
@@ -148,6 +150,10 @@ export class ScopaScene extends Phaser.Scene {
         });
         // matchCards_A(this, [this.deck[0]], [this.deck[1], this.deck[3]]);
         // Handle default case if necessary
+        break;
+      case 'SCOPA FX':
+        confettiEffects(this, {x: 0, y: -15});
+        confettiEffects(this, {x: this.cameras.main.width, y: -15});
         break;
     }
     // console.log(type);

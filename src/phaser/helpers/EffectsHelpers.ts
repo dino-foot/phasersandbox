@@ -6,7 +6,7 @@ export const confettiEffects = (context: Phaser.Scene, posFromEmit: vector2): Ph
     alpha: { min: 70, max: 100 },
     frame: { frames: [0, 1, 2, 3, 4], cycle: false },
     blendMode: Phaser.BlendModes.ADD,
-    lifespan: 2000,
+    lifespan: 1500,
     depth: 10,
     angle: { min: 0, max: 180 },
     speed: { min: 300, max: 550 },
