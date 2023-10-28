@@ -1,4 +1,4 @@
-import { Scene } from "phaser";
+import { Scene } from 'phaser';
 
 let scene: Scene;
 
@@ -14,31 +14,31 @@ interface eventsControllerInterface {
 
 const init = (sceneObj: Scene): void => {
   scene = sceneObj;
-}
+};
 
 const onGameOut = (callback): void => {
   scene.input.on('gameout', () => callback());
-}
+};
 
 const onFocus = (callback): void => {
   scene.game.events.on(Phaser.Core.Events.FOCUS, () => callback());
-}
+};
 
 const onLostFocus = (callback): void => {
   scene.game.events.on(Phaser.Core.Events.BLUR, () => callback());
-}
+};
 
 const onHidden = (callback): void => {
   scene.game.events.on(Phaser.Core.Events.HIDDEN, () => callback());
-}
+};
 
 const onVisible = (callback): void => {
   scene.game.events.on(Phaser.Core.Events.VISIBLE, () => callback());
-}
+};
 
 const onResume = (callback): void => {
   scene.game.events.on(Phaser.Core.Events.RESUME, () => callback());
-}
+};
 
 export const EventsController: eventsControllerInterface = {
   init,

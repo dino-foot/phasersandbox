@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 
-import { Bootstrap, Game } from './phaser/scenes'
+// import { PreloadScene, ScopaScene, OkeyScene } from './phaser/scenes';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -14,8 +14,8 @@ const config: Phaser.Types.Core.GameConfig = {
     mode: Phaser.Scale.ScaleModes.RESIZE,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [Bootstrap, Game],
+  // scene: [PreloadScene, ScopaScene, OkeyScene],
 };
 
-// eslint-disable-next-line import/no-anonymous-default-export
-export default new Phaser.Game(config)
+// export default new Phaser.Game(config);
+export default config;

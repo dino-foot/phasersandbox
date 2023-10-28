@@ -1,3 +1,4 @@
 export * from './PreloadScene';
-export * from './GameScene';
+export * from './ScopaScene';
+export * from './OkeyScene';
 export * from './GameSettings';
