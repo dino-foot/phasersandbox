@@ -1,6 +1,6 @@
 import { ImageLoadConfig, SpritesheetLoadConfig, TextObject } from '../types';
 
-const imagesPath: string = '/assets';
+const rootPath: string = '/assets';
 const audiosPath: string = '';
 
 export interface LoadSettings {
@@ -13,15 +13,16 @@ export interface LoadSettings {
 
 export const LoadSettings: LoadSettings = {
   images: [
-    { key: 'bg', path: `${imagesPath}/ui` },
-    { key: 'card-back', path: `${imagesPath}/scopaCards` },
-    { key: 'avatar1', path: `${imagesPath}/ui` },
-    { key: 'avatar2', path: `${imagesPath}/ui` },
-    { key: 'scopa-fx', path: `${imagesPath}/effects` },
+    { key: 'bg', path: `${rootPath}/ui` },
+    { key: 'card-back', path: `${rootPath}/scopaCards` },
+    { key: 'avatar1', path: `${rootPath}/ui` },
+    { key: 'avatar2', path: `${rootPath}/ui` },
+    { key: 'scopa-fx', path: `${rootPath}/effects` },
   ],
 
   spritesheets: [
-    { key: 'confetti', path: `${imagesPath}/effects`, frameConfig: {frameWidth: 32, frameHeight: 32} }
+    { key: 'confetti', path: `${rootPath}/effects`, frameConfig: {frameWidth: 32, frameHeight: 32} },
+    { key: 'okey-stones', path: `${rootPath}/okey`, frameConfig: {frameWidth: 52, frameHeight: 76} }
   ],
   audios: [],
   loadingText: {

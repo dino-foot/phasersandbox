@@ -16,7 +16,7 @@ const rooms: Room[] = [
   // { id: 6, name: 'Ludo' },
 ];
 
-const isDevelopment = false;
+const isDevelopment = true;
 
 function App() {
   const [gameStarted, setGameStarted] = useState(false);
@@ -48,7 +48,7 @@ function App() {
   }, [gameStarted, selectedScene]);
 
   if (isDevelopment && !gameStarted) {
-    startGame('Scopa'); // start with 'Scopa' scene in development mode
+    startGame('Okey'); // start with 'Scopa'/Okey scene in development mode
   }
 
   return (

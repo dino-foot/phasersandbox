@@ -41,7 +41,7 @@ export class ScopaScene extends Phaser.Scene {
   }
 
   create() {
-    this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'bg').setOrigin(0.5);
+    this.add.image(this.centerX, this.centerY, 'bg').setOrigin(0.5);
 
     //? create deck
     this.createDeck();
