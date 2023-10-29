@@ -17,6 +17,7 @@ export const LoadSettings: LoadSettings = {
     { key: 'card-back', path: `${imagesPath}/scopaCards` },
     { key: 'avatar1', path: `${imagesPath}/ui` },
     { key: 'avatar2', path: `${imagesPath}/ui` },
+    { key: 'scopa-fx', path: `${imagesPath}/effects` },
   ],
 
   spritesheets: [

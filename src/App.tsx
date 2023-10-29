@@ -16,6 +16,8 @@ const rooms: Room[] = [
   // { id: 6, name: 'Ludo' },
 ];
 
+const isDevelopment = false;
+
 function App() {
   const [gameStarted, setGameStarted] = useState(false);
   const [selectedScene, setSelectedScene] = useState(null);
@@ -44,6 +46,10 @@ function App() {
       };
     }
   }, [gameStarted, selectedScene]);
+
+  if (isDevelopment && !gameStarted) {
+    startGame('Scopa'); // start with 'Scopa' scene in development mode
+  }
 
   return (
     <div id="App" className="App">

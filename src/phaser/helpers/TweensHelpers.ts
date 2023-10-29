@@ -5,7 +5,8 @@ import { vector2 } from '../types';
 import _ from 'lodash';
 
 //? card shuffle animation
-export const shuffleCards_A = (context: Phaser.Scene, cardList: Card[], pos: vector2, completeCallback?: any): Phaser.Tweens.TweenChain => {
+export const shuffleCards_A = (context: Phaser.Scene, cardList: Card[], pos: vector2, 
+  completeCallback?: any): Phaser.Tweens.TweenChain => {
   const tweenChain: Phaser.Tweens.TweenChain = context.tweens.chain({
     tweens: [
       {
@@ -36,7 +37,8 @@ export const shuffleCards_A = (context: Phaser.Scene, cardList: Card[], pos: vec
   return tweenChain;
 };
 
-export const matchCards_A = (context: Phaser.Scene, targetCard: Card, matchedCards: Card[], endPos: vector2, completeCallback?: any) => {
+export const matchCards_A = (context: Phaser.Scene, targetCard: Card, matchedCards: Card[], endPos: vector2, 
+  completeCallback?: any) => {
   // reset pos to deck 
   const allCards = matchedCards.concat(targetCard);
 
@@ -89,7 +91,8 @@ export const shineCards = (context: Phaser.Scene, cardList: Card[]) => {
 };
 
 //? glow for special card/s
-export const glowCards = (context: Phaser.Scene, cardList: Card[], glowColor = 0xffff00, duration = 350, loopCount = -1, completeCallback?: any) => {
+export const glowCards = (context: Phaser.Scene, cardList: Card[], glowColor = 0xffff00, duration = 350, 
+  loopCount = -1, completeCallback?: any) => {
   const fxList = [];
   _.forEach(cardList, (card: Card) => {
     const fx = card.postFX.addGlow(glowColor, 0, 0, false, 0.2, 16);
@@ -108,4 +111,8 @@ export const glowCards = (context: Phaser.Scene, cardList: Card[], glowColor = 0
       completeCallback?.();
     }
   });
+};
+
+export const tweenBounceScaleUp = (context: Phaser.Scene, completeCallback:any) => {
+  
 };
