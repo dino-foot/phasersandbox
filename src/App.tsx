@@ -16,7 +16,7 @@ const rooms: Room[] = [
   // { id: 6, name: 'Ludo' },
 ];
 
-const isDevelopment = false;
+const isDevelopment = true;
 
 function App() {
   const [gameStarted, setGameStarted] = useState(false);

@@ -7,7 +7,8 @@ import {
   glowCards,
   matchCards_A,
   shineCards,
-  shuffleCards_A
+  shuffleCards_A,
+  tweenBounceScaleUp
 } from '../helpers';
 import { scopaDeck } from '../constants';
 import { GameSettings } from './GameSettings';
@@ -154,6 +155,8 @@ export class ScopaScene extends Phaser.Scene {
       case 'SCOPA FX':
         confettiEffects(this, {x: 0, y: -15});
         confettiEffects(this, {x: this.cameras.main.width, y: -15});
+        const scopefx = this.add.image(this.centerX, this.centerY, 'scopa-fx').setDepth(100);
+        tweenBounceScaleUp(this, [scopefx]);
         break;
     }
     // console.log(type);

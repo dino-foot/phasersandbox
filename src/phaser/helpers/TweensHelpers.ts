@@ -5,8 +5,7 @@ import { vector2 } from '../types';
 import _ from 'lodash';
 
 //? card shuffle animation
-export const shuffleCards_A = (context: Phaser.Scene, cardList: Card[], pos: vector2, 
-  completeCallback?: any): Phaser.Tweens.TweenChain => {
+export const shuffleCards_A = (context: Phaser.Scene, cardList: Card[], pos: vector2, completeCallback?: any): Phaser.Tweens.TweenChain => {
   const tweenChain: Phaser.Tweens.TweenChain = context.tweens.chain({
     tweens: [
       {
@@ -37,9 +36,8 @@ export const shuffleCards_A = (context: Phaser.Scene, cardList: Card[], pos: vec
   return tweenChain;
 };
 
-export const matchCards_A = (context: Phaser.Scene, targetCard: Card, matchedCards: Card[], endPos: vector2, 
-  completeCallback?: any) => {
-  // reset pos to deck 
+export const matchCards_A = (context: Phaser.Scene, targetCard: Card, matchedCards: Card[], endPos: vector2, completeCallback?: any) => {
+  // reset pos to deck
   const allCards = matchedCards.concat(targetCard);
 
   const tweenChain: Phaser.Tweens.TweenChain = context.tweens.chain({
@@ -50,7 +48,7 @@ export const matchCards_A = (context: Phaser.Scene, targetCard: Card, matchedCar
         y: {
           value: (target) => {
             return target.y - 15;
-          }
+          },
         },
         ease: Phaser.Math.Easing.Linear,
       },
@@ -63,7 +61,7 @@ export const matchCards_A = (context: Phaser.Scene, targetCard: Card, matchedCar
         ease: Phaser.Math.Easing.Sine.Out,
         onComplete: (tween, targets: Card[]) => {
           _.forEach(allCards, (card: Card) => card.close());
-        }
+        },
       },
       {
         targets: allCards,
@@ -72,7 +70,6 @@ export const matchCards_A = (context: Phaser.Scene, targetCard: Card, matchedCar
         y: endPos.y,
         ease: Phaser.Math.Easing.Sine.Out,
       },
-
     ],
     paused: false,
     repeat: 0,
@@ -84,15 +81,14 @@ export const matchCards_A = (context: Phaser.Scene, targetCard: Card, matchedCar
 };
 
 //? shine for special card/s
-export const shineCards = (context: Phaser.Scene, cardList: Card[]) => {
+export const shineCards = (context: Phaser.Scene, cardList: Card[] | Phaser.GameObjects.GameObject[]) => {
   _.forEach(cardList, (card: Card) => {
     card.postFX.addShine(0.5, 0.25, 5);
   });
 };
 
 //? glow for special card/s
-export const glowCards = (context: Phaser.Scene, cardList: Card[], glowColor = 0xffff00, duration = 350, 
-  loopCount = -1, completeCallback?: any) => {
+export const glowCards = (context: Phaser.Scene, cardList: Card[] | Phaser.GameObjects.GameObject[], glowColor = 0xffff00, duration = 350, loopCount = -1, completeCallback?: any) => {
   const fxList = [];
   _.forEach(cardList, (card: Card) => {
     const fx = card.postFX.addGlow(glowColor, 0, 0, false, 0.2, 16);
@@ -109,10 +105,31 @@ export const glowCards = (context: Phaser.Scene, cardList: Card[], glowColor = 0
     ease: Phaser.Math.Easing.Quadratic.Out,
     onComplete: () => {
       completeCallback?.();
-    }
+    },
   });
 };
 
-export const tweenBounceScaleUp = (context: Phaser.Scene, completeCallback:any) => {
-  
+export const tweenBounceScaleUp = (context: Phaser.Scene, targets: Phaser.GameObjects.GameObject[], completeCallback?: any) => {
+  const tweenChain: Phaser.Tweens.TweenChain = context.tweens.chain({
+    tweens: [
+      {
+        targets: targets,
+        scale: { from: 0, to: 1.4},
+        ease: Phaser.Math.Easing.Quintic.Out,
+        duration: 700,
+      },
+      {
+        targets: targets,
+        alpha: 0,
+        delay: 300,
+        duration: 300,
+        ease: Phaser.Math.Pow2,
+      },
+    ],
+    paused: false,
+    repeat: 0,
+    onComplete: () => {
+      completeCallback?.();
+    },
+  });
 };
