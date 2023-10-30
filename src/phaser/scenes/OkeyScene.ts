@@ -35,11 +35,11 @@ export class OkeyScene extends Phaser.Scene {
 
   // todo
   // stone dealing (done)
-  // stones grouping (wip)
-  // implement desktop drag and drop individual stone
+  // stones grouping 
+  //? implement desktop drag and drop individual stone (wip)
   // implement desktop drag and drop grouped stones.  The "group move" button appears when you hover on a group.
-
   // implement mobile drag and drop individual stone
+
   //? fix scopa scaling
 
   create() {
@@ -92,7 +92,7 @@ export class OkeyScene extends Phaser.Scene {
   //     dragX = Phaser.Math.Snap.To(dragX, 64);
   //     dragY = Phaser.Math.Snap.To(dragY, 64);
   //     gameObject.setPosition(dragX, dragY);
-  
+
   // const dragX = Phaser.Math.Snap.To(pointer.x, 52);
   // const dragY = Phaser.Math.Snap.To(pointer.y, 76);
   // gameObject.setPosition(dragX, dragY);
