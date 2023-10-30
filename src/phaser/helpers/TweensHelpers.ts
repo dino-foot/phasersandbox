@@ -150,6 +150,9 @@ export const okeyDealingTween = (context: Phaser.Scene, cardList: Phaser.GameObj
     const xPos = pos.x + index * cardWidth;
     const yPos = pos.y;
 
+    // testing 
+    createDropZone(context, { x: xPos, y: yPos });
+
     context.tweens.add({
       targets: card,
       x: xPos,
@@ -165,4 +168,13 @@ export const okeyDealingTween = (context: Phaser.Scene, cardList: Phaser.GameObj
       },
     });
   });
+};
+
+const createDropZone = (context: Phaser.Scene, pos: vector2) => {
+  //  A drop zone
+  const zone = context.add.zone(pos.x, pos.y, 52, 80).setDropZone();
+  //  Just a visual display of the drop zone
+  const graphics = context.add.graphics();
+  graphics.lineStyle(2, 0xffff00);
+  graphics.strokeRect(zone.x - zone.input.hitArea.width / 2, zone.y - zone.input.hitArea.height / 2, zone.input.hitArea.width, zone.input.hitArea.height);
 };
