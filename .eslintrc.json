@@ -1,0 +1,35 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true
+    },
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:react/recommended"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "sourceType": "module"
+    },
+    "plugins": [
+        "@typescript-eslint",
+        "react"
+    ],
+    "rules": {
+        "react/react-in-jsx-scope": "off",
+        "@typescript-eslint/semi": ["error", "always"],
+        "@typescript-eslint/no-unused-vars": "off",
+        "@typescript-eslint/explicit-function-return-type": "off",
+        "@typescript-eslint/space-before-function-paren": "off",
+        "@typescript-eslint/restrict-template-expressions": "off",
+        "@typescript-eslint/strict-boolean-expressions": "off",
+        "max-len": ["warn", { "code": 120 }],
+        "quotes": ["warn", "single"],
+        "comma-style": ["warn", "last"],
+        "semi": ["warn", "always"],
+        "no-unused-vars": "warn",
+        "no-case-declarations": "off"
+    }
+}
