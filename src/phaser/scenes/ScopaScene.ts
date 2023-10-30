@@ -41,7 +41,7 @@ export class ScopaScene extends Phaser.Scene {
   }
 
   create() {
-    this.add.image(this.centerX, this.centerY, 'bg').setOrigin(0.5);
+    this.add.image(this.centerX, this.centerY, 'bg').setOrigin(0.5).setScale(3);
 
     //? create deck
     this.createDeck();
@@ -52,11 +52,7 @@ export class ScopaScene extends Phaser.Scene {
     // card distribute tween
     // variation A
     // variation B
-    // card selection effect
     // card place/show tween
-    // card match tween (placed 1 card, matched with 2 card)
-    // card match fx
-    // scopa win fx
     // settabello win fx
   }
 
