@@ -85,13 +85,17 @@ export class OkeyScene extends Phaser.Scene {
   // https://labs.phaser.io/edit.html?src=src\input\dragging\drag%20vertically.js
   // https://labs.phaser.io/edit.html?src=src\input\dragging\bring%20dragged%20item%20to%20top.js
   // https://labs.phaser.io/view.html?src=src/input\dragging\scale%20during%20drag.js
+  // https://labs.phaser.io/edit.html?src=src\input\dragging\snap%20to%20grid%20on%20drag.js
 
   //   this.input.on('drag', (pointer, gameObject, dragX, dragY) => {
   //     //  This will snap our drag to a 64x64 grid
   //     dragX = Phaser.Math.Snap.To(dragX, 64);
   //     dragY = Phaser.Math.Snap.To(dragY, 64);
   //     gameObject.setPosition(dragX, dragY);
-
+  
+  // const dragX = Phaser.Math.Snap.To(pointer.x, 52);
+  // const dragY = Phaser.Math.Snap.To(pointer.y, 76);
+  // gameObject.setPosition(dragX, dragY);
   // });
 
   // width = 52px
@@ -124,11 +128,20 @@ export class OkeyScene extends Phaser.Scene {
         this.handleDragEvents('dragstart', pointer, stone, dragX, dragY, null);
       });
 
+      // stone.on('drop', (pointer, dragX, dragY, dropZone) => {
+      //   console.log('drop', dragX, dragY, dropZone);
+      //   // this.handleDragEvents('dragstart', pointer, stone, dragX, dragY, null);
+      // });
+
+      // this.input.on('drop', (pointer, gameObject, dropZone) => {
+      //   console.log('drop', gameObject, dropZone);
+      // });
+
       this.deck.push(stone);
     }
   }
 
-  handleDragEvents(event: 'drag' | 'dragend' | 'dragstart', pointer, gameObject, dragX, dragY, dropped) {
+  handleDragEvents(event: 'drag' | 'dragend' | 'dragstart' | 'drop', pointer, gameObject, dragX, dragY, dropped) {
     switch (event) {
       case 'drag':
         // console.log('drag ', gameObject);
@@ -148,7 +161,7 @@ export class OkeyScene extends Phaser.Scene {
         gameObject.setScale(1.2);
         gameObject.depth += 1;
         gameObject.angle = 5;
-        console.log(gameObject.depth);
+        // console.log(gameObject.depth);
         // Handle dragstart event logic here if needed
         break;
       default:
