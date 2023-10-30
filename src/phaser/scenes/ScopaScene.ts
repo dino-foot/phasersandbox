@@ -11,7 +11,7 @@ import {
   tweenBounceScaleUp
 } from '../helpers';
 import { scopaDeck } from '../constants';
-import { GameSettings } from './GameSettings';
+import { TextSettings } from '../settings/TextSettings';
 
 export class ScopaScene extends Phaser.Scene {
   deck: Card[] = [];
@@ -61,12 +61,12 @@ export class ScopaScene extends Phaser.Scene {
   }
 
   createUI() {
-    this.resetButton = PhaserHelpers.addText(GameSettings.RESET, this);
-    this.shineFXBtn = PhaserHelpers.addText(GameSettings.SHINE, this);
-    this.glowFXBtn = PhaserHelpers.addText(GameSettings.GLOW, this);
-    this.dealCards = PhaserHelpers.addText(GameSettings.DEAL_CARDS, this);
-    this.scopaFXBtn = PhaserHelpers.addText(GameSettings.SCOPA_FX, this);
-    this.cardMathBtn = PhaserHelpers.addText(GameSettings.CARD_MATCH, this);
+    this.resetButton = PhaserHelpers.addText(TextSettings.RESET, this);
+    this.shineFXBtn = PhaserHelpers.addText(TextSettings.SHINE, this);
+    this.glowFXBtn = PhaserHelpers.addText(TextSettings.GLOW, this);
+    this.dealCards = PhaserHelpers.addText(TextSettings.DEAL_CARDS, this);
+    this.scopaFXBtn = PhaserHelpers.addText(TextSettings.SCOPA_FX, this);
+    this.cardMathBtn = PhaserHelpers.addText(TextSettings.CARD_MATCH, this);
 
     this.resetButton.on('pointerdown', () => { this.handleUIEvents('RESET'); }, this);
     this.dealCards.on('pointerdown', () => { this.handleUIEvents('DEAL CARDS'); }, this);

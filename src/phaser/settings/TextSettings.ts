@@ -1,6 +1,6 @@
 import { TextObject } from '../types';
 
-interface GameSettingsInterface {
+interface TextSettingsInterface {
   RESET: TextObject;
   GLOW: TextObject;
   SHINE: TextObject;
@@ -9,7 +9,7 @@ interface GameSettingsInterface {
   CARD_MATCH: TextObject;
 }
 
-export const GameSettings: GameSettingsInterface = {
+export const TextSettings: TextSettingsInterface = {
   RESET: {
     text: 'RESET',
     x: 100,
@@ -87,7 +87,7 @@ export const GameSettings: GameSettingsInterface = {
       y: 0.5,
     },
     style: {
-      fontSize: 16,
+      fontSize: 26,
       color: '#ffffff',
       backgroundColor: '#ff00ff',
     },

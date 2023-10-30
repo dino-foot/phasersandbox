@@ -114,7 +114,7 @@ export const tweenBounceScaleUp = (context: Phaser.Scene, targets: Phaser.GameOb
     tweens: [
       {
         targets: targets,
-        scale: { from: 0, to: 1.4},
+        scale: { from: 0, to: 1.4 },
         ease: Phaser.Math.Easing.Quintic.Out,
         duration: 700,
       },
@@ -131,5 +131,38 @@ export const tweenBounceScaleUp = (context: Phaser.Scene, targets: Phaser.GameOb
     onComplete: () => {
       completeCallback?.();
     },
+  });
+};
+
+export const okeyDealingEvent = (context: Phaser.Scene, cardList: Phaser.GameObjects.Image[], pos: vector2, delay,
+  completeCallback?: any) => {
+
+  setTimeout(() => {
+    okeyDealingTween(context, cardList, pos, completeCallback);
+  }, delay);
+};
+
+export const okeyDealingTween = (context: Phaser.Scene, cardList: Phaser.GameObjects.Image[], pos: vector2,
+  completeCallback?: any) => {
+
+  const cardWidth = 52;
+  cardList.forEach((card, index) => {
+    const xPos = pos.x + index * cardWidth;
+    const yPos = pos.y;
+
+    context.tweens.add({
+      targets: card,
+      x: xPos,
+      y: yPos,
+      angle: { from: 180, to: 0 },
+      duration: 600, // Duration of the tween in milliseconds
+      ease: Phaser.Math.Easing.Sine.Out,
+      delay: index * 100, // Delay between tweens for each card
+      onComplete: () => {
+        // Tween complete callback
+        completeCallback?.();
+        console.log('Card tween complete');
+      },
+    });
   });
 };

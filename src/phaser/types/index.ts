@@ -62,7 +62,7 @@ export interface RectData extends ItemData {
 }
 
 export interface ImageButtonConfig {
-    angle: any;
+    angle: number;
     id?: string;
     x: number;
     y: number;
@@ -87,7 +87,7 @@ export interface ImageButtonConfig {
         height: number;
     };
     text?: {
-        lineHeight: any;
+        lineHeight: number;
         text: string;
         xOffset: number;
         yOffset: number;
