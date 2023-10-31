@@ -81,14 +81,7 @@ export class OkeyScene extends Phaser.Scene {
 
   create() {
     this.dealStone = PhaserHelpers.addText(TextSettings.DEAL_CARDS, this);
-
-    this.dealStone.on(
-      'pointerdown',
-      () => {
-        this.handleUIEvents('DEAL STONE');
-      },
-      this
-    );
+    this.dealStone.on('pointerdown', () => { this.handleUIEvents('DEAL STONE'); }, this);
   }
 
   handleUIEvents(type: 'DEAL STONE') {
@@ -96,7 +89,7 @@ export class OkeyScene extends Phaser.Scene {
 
     switch (type) {
       case 'DEAL STONE':
-        const cardList = _.sampleSize(this.deck, 12);
+        const cardList = _.sampleSize(this.deck, 20);
         _.pullAll(this.deck, cardList);
 
         okeyDealingTween(this, cardList, this.zoneList);
@@ -109,7 +102,6 @@ export class OkeyScene extends Phaser.Scene {
   // https://labs.phaser.io/view.html?src=src\input\zones\drop%20zone.js
   // https://labs.phaser.io/edit.html?src=src\input\dragging\drag%20vertically.js
   // https://labs.phaser.io/edit.html?src=src\input\dragging\bring%20dragged%20item%20to%20top.js
-  // https://labs.phaser.io/view.html?src=src/input\dragging\scale%20during%20drag.js
   // https://labs.phaser.io/edit.html?src=src\input\dragging\snap%20to%20grid%20on%20drag.js
 
   //   this.input.on('drag', (pointer, gameObject, dragX, dragY) => {
