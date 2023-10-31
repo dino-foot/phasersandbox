@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 import Phaser from 'phaser';
 import _ from 'lodash';
 import { PhaserHelpers, createDropZone, okeyDealingEvent, okeyDealingTween, tweenPosition, } from '../helpers';
@@ -16,6 +17,8 @@ export class OkeyScene extends Phaser.Scene {
   bottomPlatform: Phaser.GameObjects.Rectangle;
   okeyLabel = ['black', 'blue', 'red', 'yellow'];
   dealStone: Phaser.GameObjects.Text;
+  currentDropZone: Phaser.GameObjects.Zone;
+  lastDropZone: Phaser.GameObjects.Zone;
   cardWidth = 52;
   cardHeight = 76;
   constructor() {
@@ -24,6 +27,8 @@ export class OkeyScene extends Phaser.Scene {
 
   init() {
     console.log('okey-init');
+    this.currentDropZone = null;
+    this.lastDropZone = null;
     this.centerX = this.cameras.main.centerX;
     this.centerY = this.cameras.main.centerY;
 
@@ -136,7 +141,9 @@ export class OkeyScene extends Phaser.Scene {
       stone.depth = 10;
       stone.setName(`${this.okeyLabel[labelIndex]}_${stoneNumber}`);
       stone.setInteractive({ draggable: true, useHandCursor: true });
+      this.deck.push(stone);
 
+      //? ----- object events ------ 
       stone.on('drag', (pointer, dragX, dragY) => {
         this.handleDragEvents('drag', pointer, stone, dragX, dragY, null);
       });
@@ -151,22 +158,24 @@ export class OkeyScene extends Phaser.Scene {
       });
 
 
-      //? ------- 
+      //? ------- drag events ------
       this.input.on('dragenter', (pointer, gameObject, dropZone) => {
-        console.log('dragenter', dropZone.name);
-        // this.handleDragEvents('dragend', pointer, stone, dragX, dragY, dropped);
+        // console.log('dragenter', dropZone.name);
+        this.currentDropZone = dropZone;
       });
 
       this.input.on('dragleave', (pointer, gameObject, dropZone) => {
-        console.log('dragleave', dropZone.name);
+        // console.log('dragleave', dropZone.name);
+        this.lastDropZone = dropZone;
+        this.currentDropZone = null;
       });
 
-      this.input.on('drop', (pointer, gameObject, dropZone) => {
-        // console.log('drop', gameObject.name, dropZone);
-        this.handleDropEvent('drop', pointer, gameObject, dropZone);
+
+      stone.on('pointerup', (pointer, localX, localY) => {
+        // console.log('pointerup ', this.lastDropZone?.name);
+        this.handleDropEvent(pointer, stone, this.currentDropZone);
       });
 
-      this.deck.push(stone);
     }
   }
 
@@ -178,9 +187,8 @@ export class OkeyScene extends Phaser.Scene {
         gameObject.y = dragY;
         break;
       case 'dragend':
+        // console.log('dragend ', dropped);
         if (!dropped) {
-          // gameObject.x = gameObject.input.dragStartX;
-          // gameObject.y = gameObject.input.dragStartY;
           tweenPosition(this, gameObject, {x: gameObject.input.dragStartX, y: gameObject.input.dragStartY});
         }
         gameObject.angle = 0;
@@ -199,15 +207,26 @@ export class OkeyScene extends Phaser.Scene {
     }
   } // end
 
-  handleDropEvent(event: 'drop', pointer, gameObject, dropZone) {
-    console.log('drop zone ', dropZone.getData('isOccupied'));
+  handleDropEvent(pointer, gameObject, dropZone) {
+    // console.log('last drop ', this.lastDropZone?.name);
+    // console.log('pointerup ', dropZone.getData('isOccupied'));
 
-    if (dropZone.getData('isOccupied') === false) {
-      gameObject.x = dropZone.x;
-      gameObject.y = dropZone.y;
-      dropZone.setData('isOccupied', true);
+    if (this.lastDropZone && this.lastDropZone !== this.currentDropZone) {
+      this.lastDropZone.setData('isOccupied', false);
     }
 
+    if (dropZone == null) return;
+    this.currentDropZone = null;
+
+
+    if (dropZone.getData('isOccupied') === true) {
+      tweenPosition(this, gameObject, { x: gameObject.input.dragStartX, y: gameObject.input.dragStartY });
+      return;
+    }
+
+    gameObject.x = dropZone.x;
+    gameObject.y = dropZone.y;
+    dropZone.setData('isOccupied', true);
   }
 
 }
