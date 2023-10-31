@@ -1,7 +1,7 @@
 /* eslint-disable prefer-const */
 import Phaser from 'phaser';
 import _ from 'lodash';
-import { PhaserHelpers, createDropZone, okeyDealingEvent, okeyDealingTween, tweenPosition, } from '../helpers';
+import { PhaserHelpers, createDropZone, okeyDealingTween, tweenPosition, } from '../helpers';
 import { ShapeSettings } from '../settings/ShapeSettings';
 import { TextSettings } from '../settings/TextSettings';
 
@@ -19,6 +19,7 @@ export class OkeyScene extends Phaser.Scene {
   dealStone: Phaser.GameObjects.Text;
   currentDropZone: Phaser.GameObjects.Zone;
   lastDropZone: Phaser.GameObjects.Zone;
+  zoneList: Phaser.GameObjects.Zone[];
   cardWidth = 52;
   cardHeight = 76;
   constructor() {
@@ -29,6 +30,7 @@ export class OkeyScene extends Phaser.Scene {
     console.log('okey-init');
     this.currentDropZone = null;
     this.lastDropZone = null;
+    this.zoneList = [];
     this.centerX = this.cameras.main.centerX;
     this.centerY = this.cameras.main.centerY;
 
@@ -40,8 +42,8 @@ export class OkeyScene extends Phaser.Scene {
     this.topPlatform = PhaserHelpers.addRectangle(ShapeSettings.Rectangle_top, this);
     this.bottomPlatform = PhaserHelpers.addRectangle(ShapeSettings.Rectangle_bottom, this);
 
-    this.topPlatform.setPosition(this.centerX, this.game.canvas.height - 400);
-    this.bottomPlatform.setPosition(this.centerX, this.game.canvas.height - 300);
+    this.topPlatform.setPosition(this.centerX, this.game.canvas.height - 500);
+    this.bottomPlatform.setPosition(this.centerX, this.game.canvas.height - 350);
 
     // create drop zone for cards 
     this.topStartX = this.topPlatform.x + this.cardWidth / 2 - this.topPlatform.width / 2;
@@ -54,12 +56,14 @@ export class OkeyScene extends Phaser.Scene {
       const zone = createDropZone(this, { x: this.topStartX + i * this.cardWidth, y: this.topStartY });
       zone.setName(`zone_top_${i}`);
       zone.setData('isOccupied', false);
+      this.zoneList.push(zone);
     }
 
     for (let i = 0; i < Math.round(this.bottomPlatform.width / this.cardWidth); i++) {
       const zone = createDropZone(this, { x: this.bottomStartX + i * this.cardWidth, y: this.bottomStartY });
       zone.setName(`zone_bottom_${i}`);
       zone.setData('isOccupied', false);
+      this.zoneList.push(zone);
     }
    
 
@@ -92,15 +96,10 @@ export class OkeyScene extends Phaser.Scene {
 
     switch (type) {
       case 'DEAL STONE':
-        const cardListTop = _.sampleSize(this.deck, 6);
-        _.pullAll(this.deck, cardListTop);
+        const cardList = _.sampleSize(this.deck, 12);
+        _.pullAll(this.deck, cardList);
 
-        const cardListBottom = _.sampleSize(this.deck, 8);
-        _.pullAll(this.deck, cardListBottom);
-
-
-        okeyDealingTween(this, cardListTop, { x: this.topStartX, y: this.topStartY });
-        okeyDealingTween(this, cardListBottom, { x: this.bottomStartX, y: this.bottomStartY });
+        okeyDealingTween(this, cardList, this.zoneList);
 
         console.log('deal stone');
         break;

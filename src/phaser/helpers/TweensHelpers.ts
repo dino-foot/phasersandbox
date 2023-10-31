@@ -134,41 +134,38 @@ export const tweenBounceScaleUp = (context: Phaser.Scene, targets: Phaser.GameOb
   });
 };
 
-export const okeyDealingEvent = (context: Phaser.Scene, cardList: Phaser.GameObjects.Image[], pos: vector2, delay,
-  completeCallback?: any) => {
+// export const okeyDealingEvent = (context: Phaser.Scene, cardList: Phaser.GameObjects.Image[], pos: vector2, delay) => {
 
-  setTimeout(() => {
-    okeyDealingTween(context, cardList, pos, completeCallback);
-  }, delay);
-};
+  // setTimeout(() => {
+  //   okeyDealingTween(context, cardList, pos);
+  // }, delay);
+// };
 
-export const okeyDealingTween = (context: Phaser.Scene, cardList: Phaser.GameObjects.Image[], pos: vector2,
-  completeCallback?: any) => {
-
-  const cardWidth = 52;
+export const okeyDealingTween = (context: Phaser.Scene, cardList: Phaser.GameObjects.Image[], zoneList: Phaser.GameObjects.Zone[]) => {
   cardList.forEach((card, index) => {
-    const xPos = pos.x + index * cardWidth;
-    const yPos = pos.y;
-
-    // testing 
-    // createDropZone(context, { x: xPos, y: yPos });
-
-    context.tweens.add({
-      targets: card,
-      x: xPos,
-      y: yPos,
-      angle: { from: 180, to: 0 },
-      duration: 600, // Duration of the tween in milliseconds
-      ease: Phaser.Math.Easing.Sine.Out,
-      delay: index * 100, // Delay between tweens for each card
-      onComplete: () => {
-        // Tween complete callback
-        completeCallback?.();
-        console.log('Card tween complete');
-      },
-    });
+    const zone = zoneList[index];
+    const { x, y } = zone;
+    if (zone.getData('isOccupied') === false) {
+      tweenPosition(context, card, { x, y }, {angle: { from: 180, to: 0 }, delay: index * 100, duration: 600});
+      console.log('true ');
+      zone.setData('isOccupied', true);
+    }
   });
 };
+
+
+export const tweenPosition = (context: Phaser.Scene, target: Phaser.GameObjects.GameObject, pos: vector2, data?: any) => {
+  context.tweens.add({
+    targets: target,
+    x: pos.x,
+    y: pos.y,
+    delay: data != null ? data?.delay : 0,
+    duration: data != null ? data?.duration : 200,
+    angle: data != null ? data?.angle : 0,
+    ease: Phaser.Math.Easing.Sine.Out,
+  });
+};
+
 
 export const createDropZone = (context: Phaser.Scene, pos: vector2): Phaser.GameObjects.Zone => {
   //  A drop zone
@@ -178,14 +175,4 @@ export const createDropZone = (context: Phaser.Scene, pos: vector2): Phaser.Game
   graphics.lineStyle(2, 0xffff00);
   graphics.strokeRect(zone.x - zone.input.hitArea.width / 2, zone.y - zone.input.hitArea.height / 2, zone.input.hitArea.width, zone.input.hitArea.height);
   return zone;
-};
-
-export const tweenPosition = (context: Phaser.Scene, target: Phaser.GameObjects.GameObject, pos:vector2)=>{
-  context.tweens.add({
-    targets: target,
-    x:pos.x,
-    y: pos.y,
-    duration: 200,
-    ease: Phaser.Math.Easing.Sine.Out,
-  });
 };
