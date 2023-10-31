@@ -151,7 +151,7 @@ export const okeyDealingTween = (context: Phaser.Scene, cardList: Phaser.GameObj
     const yPos = pos.y;
 
     // testing 
-    createDropZone(context, { x: xPos, y: yPos });
+    // createDropZone(context, { x: xPos, y: yPos });
 
     context.tweens.add({
       targets: card,
@@ -170,11 +170,22 @@ export const okeyDealingTween = (context: Phaser.Scene, cardList: Phaser.GameObj
   });
 };
 
-const createDropZone = (context: Phaser.Scene, pos: vector2) => {
+export const createDropZone = (context: Phaser.Scene, pos: vector2): Phaser.GameObjects.Zone => {
   //  A drop zone
-  const zone = context.add.zone(pos.x, pos.y, 52, 80).setDropZone();
+  const zone: Phaser.GameObjects.Zone = context.add.zone(pos.x, pos.y, 52, 80).setDropZone();
   //  Just a visual display of the drop zone
   const graphics = context.add.graphics();
   graphics.lineStyle(2, 0xffff00);
   graphics.strokeRect(zone.x - zone.input.hitArea.width / 2, zone.y - zone.input.hitArea.height / 2, zone.input.hitArea.width, zone.input.hitArea.height);
+  return zone;
+};
+
+export const tweenPosition = (context: Phaser.Scene, target: Phaser.GameObjects.GameObject, pos:vector2)=>{
+  context.tweens.add({
+    targets: target,
+    x:pos.x,
+    y: pos.y,
+    duration: 200,
+    ease: Phaser.Math.Easing.Sine.Out,
+  });
 };

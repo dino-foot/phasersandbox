@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import _ from 'lodash';
-import { PhaserHelpers, okeyDealingEvent, okeyDealingTween } from '../helpers';
+import { PhaserHelpers, createDropZone, okeyDealingEvent, okeyDealingTween, tweenPosition, } from '../helpers';
 import { ShapeSettings } from '../settings/ShapeSettings';
 import { TextSettings } from '../settings/TextSettings';
 
@@ -8,10 +8,16 @@ export class OkeyScene extends Phaser.Scene {
   deck: Phaser.GameObjects.GameObject[] = [];
   centerX: number;
   centerY: number;
+  topStartX: number;
+  topStartY: number;
+  bottomStartX: number;
+  bottomStartY: number;
   topPlatform: Phaser.GameObjects.Rectangle;
   bottomPlatform: Phaser.GameObjects.Rectangle;
   okeyLabel = ['black', 'blue', 'red', 'yellow'];
   dealStone: Phaser.GameObjects.Text;
+  cardWidth = 52;
+  cardHeight = 76;
   constructor() {
     super('okey');
   }
@@ -21,14 +27,36 @@ export class OkeyScene extends Phaser.Scene {
     this.centerX = this.cameras.main.centerX;
     this.centerY = this.cameras.main.centerY;
 
-    const bg = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'bg').setOrigin(0.5);
+    const bg = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'bg');
+    bg.setOrigin(0.5);
     bg.setScale(2);
+
     // create prototype lavel with graphics/geom
     this.topPlatform = PhaserHelpers.addRectangle(ShapeSettings.Rectangle_top, this);
     this.bottomPlatform = PhaserHelpers.addRectangle(ShapeSettings.Rectangle_bottom, this);
 
     this.topPlatform.setPosition(this.centerX, this.game.canvas.height - 400);
     this.bottomPlatform.setPosition(this.centerX, this.game.canvas.height - 300);
+
+    // create drop zone for cards 
+    this.topStartX = this.topPlatform.x + this.cardWidth / 2 - this.topPlatform.width / 2;
+    this.topStartY = this.topPlatform.y + this.cardHeight / 2 - this.topPlatform.height / 2;
+
+    this.bottomStartX = this.bottomPlatform.x + this.cardWidth / 2 - this.bottomPlatform.width / 2;
+    this.bottomStartY = this.bottomPlatform.y + this.cardHeight / 2 - this.bottomPlatform.height / 2;
+
+    for (let i = 0; i < Math.round(this.topPlatform.width / this.cardWidth); i++) {
+      const zone = createDropZone(this, { x: this.topStartX + i * this.cardWidth, y: this.topStartY });
+      zone.setName(`zone_top_${i}`);
+      zone.setData('isOccupied', false);
+    }
+
+    for (let i = 0; i < Math.round(this.bottomPlatform.width / this.cardWidth); i++) {
+      const zone = createDropZone(this, { x: this.bottomStartX + i * this.cardWidth, y: this.bottomStartY });
+      zone.setName(`zone_bottom_${i}`);
+      zone.setData('isOccupied', false);
+    }
+   
 
     this.createDeck();
   }
@@ -59,22 +87,15 @@ export class OkeyScene extends Phaser.Scene {
 
     switch (type) {
       case 'DEAL STONE':
-        const cardListTop = _.sampleSize(this.deck, 12);
+        const cardListTop = _.sampleSize(this.deck, 6);
         _.pullAll(this.deck, cardListTop);
 
         const cardListBottom = _.sampleSize(this.deck, 8);
         _.pullAll(this.deck, cardListBottom);
 
-        const cardWidth = 52;
-        const cardHeight = 76;
-        const topStartX = this.topPlatform.x + cardWidth / 2 - this.topPlatform.width / 2;
-        const topStartY = this.topPlatform.y + cardHeight / 2 - this.topPlatform.height / 2;
 
-        const bottomStartX = this.bottomPlatform.x + cardWidth / 2 - this.bottomPlatform.width / 2;
-        const bottomStartY = this.bottomPlatform.y + cardHeight / 2 - this.bottomPlatform.height / 2;
-
-        okeyDealingTween(this, cardListTop, { x: topStartX, y: topStartY });
-        okeyDealingTween(this, cardListBottom, { x: bottomStartX, y: bottomStartY });
+        okeyDealingTween(this, cardListTop, { x: this.topStartX, y: this.topStartY });
+        okeyDealingTween(this, cardListBottom, { x: this.bottomStartX, y: this.bottomStartY });
 
         console.log('deal stone');
         break;
@@ -124,24 +145,32 @@ export class OkeyScene extends Phaser.Scene {
         this.handleDragEvents('dragend', pointer, stone, dragX, dragY, dropped);
       });
 
+
       stone.on('dragstart', (pointer, dragX, dragY) => {
         this.handleDragEvents('dragstart', pointer, stone, dragX, dragY, null);
       });
 
-      // stone.on('drop', (pointer, dragX, dragY, dropZone) => {
-      //   console.log('drop', dragX, dragY, dropZone);
-      //   // this.handleDragEvents('dragstart', pointer, stone, dragX, dragY, null);
-      // });
 
-      // this.input.on('drop', (pointer, gameObject, dropZone) => {
-      //   console.log('drop', gameObject, dropZone);
-      // });
+      //? ------- 
+      this.input.on('dragenter', (pointer, gameObject, dropZone) => {
+        console.log('dragenter', dropZone.name);
+        // this.handleDragEvents('dragend', pointer, stone, dragX, dragY, dropped);
+      });
+
+      this.input.on('dragleave', (pointer, gameObject, dropZone) => {
+        console.log('dragleave', dropZone.name);
+      });
+
+      this.input.on('drop', (pointer, gameObject, dropZone) => {
+        // console.log('drop', gameObject.name, dropZone);
+        this.handleDropEvent('drop', pointer, gameObject, dropZone);
+      });
 
       this.deck.push(stone);
     }
   }
 
-  handleDragEvents(event: 'drag' | 'dragend' | 'dragstart' | 'drop', pointer, gameObject, dragX, dragY, dropped) {
+  handleDragEvents(event: 'drag' | 'dragend' | 'dragstart', pointer, gameObject, dragX, dragY, dropped) {
     switch (event) {
       case 'drag':
         // console.log('drag ', gameObject);
@@ -150,23 +179,35 @@ export class OkeyScene extends Phaser.Scene {
         break;
       case 'dragend':
         if (!dropped) {
-          gameObject.x = gameObject.input.dragStartX;
-          gameObject.y = gameObject.input.dragStartY;
+          // gameObject.x = gameObject.input.dragStartX;
+          // gameObject.y = gameObject.input.dragStartY;
+          tweenPosition(this, gameObject, {x: gameObject.input.dragStartX, y: gameObject.input.dragStartY});
         }
         gameObject.angle = 0;
         gameObject.setScale(1);
         gameObject.depth -= 1;
         break;
       case 'dragstart':
-        gameObject.setScale(1.2);
+        gameObject.setScale(1.25);
         gameObject.depth += 1;
         gameObject.angle = 5;
         // console.log(gameObject.depth);
-        // Handle dragstart event logic here if needed
         break;
       default:
         // Handle other events if necessary
         break;
     }
   } // end
+
+  handleDropEvent(event: 'drop', pointer, gameObject, dropZone) {
+    console.log('drop zone ', dropZone.getData('isOccupied'));
+
+    if (dropZone.getData('isOccupied') === false) {
+      gameObject.x = dropZone.x;
+      gameObject.y = dropZone.y;
+      dropZone.setData('isOccupied', true);
+    }
+
+  }
+
 }
