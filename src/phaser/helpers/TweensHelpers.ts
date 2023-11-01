@@ -147,7 +147,7 @@ export const okeyDealingTween = (context: Phaser.Scene, cardList: Phaser.GameObj
     const { x, y } = zone;
     if (zone.getData('isOccupied') === false) {
       tweenPosition(context, card, { x, y }, {angle: { from: 180, to: 0 }, delay: index * 100, duration: 600});
-      console.log('true ');
+      // console.log('true ');
       zone.setData('isOccupied', true);
     }
   });
@@ -167,12 +167,14 @@ export const tweenPosition = (context: Phaser.Scene, target: Phaser.GameObjects.
 };
 
 
-export const createDropZone = (context: Phaser.Scene, pos: vector2): Phaser.GameObjects.Zone => {
+export const createDropZone = (context: Phaser.Scene, pos: vector2, debug=false): Phaser.GameObjects.Zone => {
   //  A drop zone
   const zone: Phaser.GameObjects.Zone = context.add.zone(pos.x, pos.y, 52, 80).setDropZone();
-  //  Just a visual display of the drop zone
-  const graphics = context.add.graphics();
-  graphics.lineStyle(2, 0xffff00);
-  graphics.strokeRect(zone.x - zone.input.hitArea.width / 2, zone.y - zone.input.hitArea.height / 2, zone.input.hitArea.width, zone.input.hitArea.height);
+  if (debug) {
+    //  Just a visual display of the drop zone
+    const graphics = context.add.graphics();
+    graphics.lineStyle(2, 0xffff00);
+    graphics.strokeRect(zone.x - zone.input.hitArea.width / 2, zone.y - zone.input.hitArea.height / 2, zone.input.hitArea.width, zone.input.hitArea.height);
+  }
   return zone;
 };
