@@ -220,97 +220,33 @@ export class OkeyScene extends Phaser.Scene {
   }
 
   checkGroup(zones: Phaser.GameObjects.Zone[], targetZone: Phaser.GameObjects.Zone) {
-    const groupedCardsByColor = {
-      black: [],
-      blue: [],
-      red: [],
-      yellow: [],
-    };
 
     const targetIndex = zones.findIndex((zone) => zone.name === targetZone.name);
-    console.log('target ', targetIndex);
+    
+    let adjacentCards = [];
 
-    const allGroups = [];
-    let group = [];
+    const rightAdjacentCards = _.chain(zones)
+      .slice(targetIndex)
+      .takeWhile(zone => zone.getData('isOccupied') === true)
+      .map(zone => zone.getData('data'))
+      .value();
 
-    // Iterate from targetIndex to the end of the list
-    for (let i = targetIndex; i < zones.length; i++) {
-      const zone = zones[i];
-      if (zone.getData('isOccupied') === true) {
-        const card = zone.getData('data');
-        group.push(card);
-        // console.log('zone is occupied');
-      } else {
-        // console.log('zone is not occupied');
-        if (group.length < 3) group = [];
-        else {
-          // found adjacent group check validity
-          allGroups.push(group);
-          group = [];
-        }
-        break;
-      }
-    }
+    // Get left adjacent cards
+    const leftAdjacentCards = _.chain(zones)
+      .slice(0, targetIndex)
+      .reverse()
+      .takeWhile(zone => zone.getData('isOccupied') === true)
+      .map(zone => zone.getData('data'))
+      .value();
 
-    if (group.length >= 3) {
-      allGroups.push(group);
-    }
+    // Concatenate both left and right adjacent cards
+    adjacentCards = _.concat(leftAdjacentCards.reverse(), rightAdjacentCards);
 
-    const validGroupToCheck = []; //[{}]
-    if (allGroups.length > 0) {
-      allGroups[0].forEach((item) => {
-        const obj = parseOkeyData(item.name);
-        validGroupToCheck.push(obj);
-      });
-    }
-
-    this.okeyLabel.forEach((label) => {
-      groupedCardsByColor[label] = _.filter(validGroupToCheck, (item) => {
-        return item.label == label;
-      });
-    });
-
-    console.log(this.filterConsecutiveCards(validGroupToCheck));
+    console.log('target ', adjacentCards);
+    // todo if group size is = 3 or 3>
+    //? merge as group and drag and drop func
+    
     // console.log(validGroupToCheck);
-
-    // Iterate from targetIndex to the start of the list
-    // for (let i = targetIndex - 1; i >= 0; i--) {
-    //   const zone = zones[i];
-    //   // console.log(card.name, card.value);
-    // }
-  }
-
-  filterConsecutiveCards(cards) {
-    // Check if the input list is empty or contains only one card
-    if (cards.length < 3) {
-      return [];
-    }
-
-    const groupedCards = _.groupBy(cards, 'label');
-    const subsets = [];
-  
-    for (const label in groupedCards) {
-      const group = groupedCards[label];
-      const sortedGroup = _.sortBy(group, 'value');
-  
-      let consecutiveSubset = [sortedGroup[0]];
-      for (let i = 1; i < sortedGroup.length; i++) {
-        if (sortedGroup[i].value === sortedGroup[i - 1].value + 1) {
-          consecutiveSubset.push(sortedGroup[i]);
-        } else {
-          if (consecutiveSubset.length >= 3) {
-            subsets.push(consecutiveSubset);
-          }
-          consecutiveSubset = [sortedGroup[i]];
-        }
-      }
-  
-      if (consecutiveSubset.length >= 3) {
-        subsets.push(consecutiveSubset);
-      }
-    }
-  
-    return _.flatten(subsets);
   }
 
   determineZoneType(zoneName: string) {
