@@ -21,6 +21,8 @@ export class OkeyScene extends Phaser.Scene {
   targetDropZone: Phaser.GameObjects.Zone;
   lastDropZone: Phaser.GameObjects.Zone;
   zoneList: Phaser.GameObjects.Zone[];
+  zoneTop: Phaser.GameObjects.Zone[];
+  zoneBottom: Phaser.GameObjects.Zone[];
   cardWidth = 52;
   cardHeight = 76;
   constructor() {
@@ -32,6 +34,8 @@ export class OkeyScene extends Phaser.Scene {
     this.targetDropZone = null;
     this.lastDropZone = null;
     this.zoneList = [];
+    this.zoneTop = [];
+    this.zoneBottom = [];
     this.centerX = this.cameras.main.centerX;
     this.centerY = this.cameras.main.centerY;
 
@@ -57,6 +61,7 @@ export class OkeyScene extends Phaser.Scene {
       const zone = createDropZone(this, { x: this.topStartX + i * this.cardWidth, y: this.topStartY }, true);
       zone.setName(`zone_top_${i}`);
       zone.setData('isOccupied', false);
+      this.zoneTop.push(zone);
       this.zoneList.push(zone);
     }
 
@@ -64,6 +69,7 @@ export class OkeyScene extends Phaser.Scene {
       const zone = createDropZone(this, { x: this.bottomStartX + i * this.cardWidth, y: this.bottomStartY }, true);
       zone.setName(`zone_bottom_${i}`);
       zone.setData('isOccupied', false);
+      this.zoneBottom.push(zone);
       this.zoneList.push(zone);
     }
 
@@ -148,11 +154,6 @@ export class OkeyScene extends Phaser.Scene {
         // console.log(`dragenter >> target: ${this.targetDropZone?.getData('isOccupied')} | last: ${this.lastDropZone?.getData('isOccupied')}`);
       });
 
-      // this.input.on('dragleave', (pointer, gameObject, dropZone) => {
-      //   // console.log('dragleave ', dropZone.name, this.lastDropZone?.name);
-      //   // this.lastDropZone = dropZone;
-      //   // this.currentDropZone = null;
-      // });
 
       stone.on('pointerup', (pointer, localX, localY) => {
         // console.log('pointerup ', this.lastDropZone?.name);
@@ -197,6 +198,7 @@ export class OkeyScene extends Phaser.Scene {
       gameObject.x = dropZone.x;
       gameObject.y = dropZone.y;
       dropZone.setData('isOccupied', true);
+      dropZone.setData('isOccupied', gameObject);
 
       if (this.lastDropZone && this.lastDropZone !== this.targetDropZone) {
         this.lastDropZone.setData('isOccupied', false);
@@ -204,6 +206,8 @@ export class OkeyScene extends Phaser.Scene {
         this.lastDropZone = null;
       }
 
+      const zone = this.determineZoneType(dropZone.name) === 'top' ? this.zoneTop : this.zoneBottom;
+      this.checkGroup(zone, dropZone);
       // console.log(`after >> target: ${dropZone?.getData('isOccupied')} | last: ${this.lastDropZone?.getData('isOccupied')}`);
     } else {
       // when the drop zone is already occupied / or invalid 
@@ -212,6 +216,19 @@ export class OkeyScene extends Phaser.Scene {
       this.targetDropZone = null;
     }
     // console.log(`after >> target: ${dropZone?.getData('isOccupied')} | last: ${this.lastDropZone?.getData('isOccupied')}`);
+  }
+
+  checkGroup(zones: Phaser.GameObjects.Zone[], targetZone: Phaser.GameObjects.Zone) {
+    const targetIndex = zones.findIndex(zone => zone.name === targetZone.name);
+    console.log('target ', targetIndex);
+  }
+
+  determineZoneType(zoneName: string) {
+    if (zoneName.includes('zone_top')) {
+      return 'top';
+    } else {
+      return 'bottom';
+    } 
   }
 
 }
