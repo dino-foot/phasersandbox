@@ -200,6 +200,7 @@ export class OkeyScene extends Phaser.Scene {
 
       if (this.lastDropZone && this.lastDropZone !== this.targetDropZone) {
         this.lastDropZone.setData('isOccupied', false);
+        this.lastDropZone.setData('data', null);
         this.lastDropZone = null;
       }
 
