@@ -2,7 +2,7 @@
 /* eslint-disable prefer-const */
 import Phaser from 'phaser';
 import _ from 'lodash';
-import { PhaserHelpers, createDropZone, okeyDealingTween, tweenPosition, } from '../helpers';
+import { PhaserHelpers, createDropZone, okeyDealingTween, parseOkeyData, tweenPosition, } from '../helpers';
 import { ShapeSettings } from '../settings/ShapeSettings';
 import { TextSettings } from '../settings/TextSettings';
 
@@ -50,7 +50,7 @@ export class OkeyScene extends Phaser.Scene {
     this.topPlatform.setPosition(this.centerX, this.game.canvas.height - 500);
     this.bottomPlatform.setPosition(this.centerX, this.game.canvas.height - 350);
 
-    // create drop zone for cards 
+    // create drop zone for cards
     this.topStartX = this.topPlatform.x + this.cardWidth / 2 - this.topPlatform.width / 2;
     this.topStartY = this.topPlatform.y + this.cardHeight / 2 - this.topPlatform.height / 2;
 
@@ -73,14 +73,13 @@ export class OkeyScene extends Phaser.Scene {
       this.zoneList.push(zone);
     }
 
-
     this.createDeck();
   }
 
   // todo
   // stone dealing (done)
-  // stones grouping 
-  //? implement desktop drag and drop individual stone (wip)
+  //? stones grouping (wip)
+  // implement desktop drag and drop individual stone (done)
   // implement desktop drag and drop grouped stones.  The "group move" button appears when you hover on a group.
   // implement mobile drag and drop individual stone
   // add different cursor
@@ -89,7 +88,13 @@ export class OkeyScene extends Phaser.Scene {
 
   create() {
     this.dealStone = PhaserHelpers.addText(TextSettings.DEAL_CARDS, this);
-    this.dealStone.on('pointerdown', () => { this.handleUIEvents('DEAL STONE'); }, this);
+    this.dealStone.on(
+      'pointerdown',
+      () => {
+        this.handleUIEvents('DEAL STONE');
+      },
+      this
+    );
   }
 
   handleUIEvents(type: 'DEAL STONE') {
@@ -97,17 +102,17 @@ export class OkeyScene extends Phaser.Scene {
 
     switch (type) {
       case 'DEAL STONE':
-        const cardList = _.sampleSize(this.deck, 13);
+        const cardList = _.sampleSize(this.deck, 34);
         _.pullAll(this.deck, cardList);
 
-        okeyDealingTween(this, cardList, this.zoneList);
+        okeyDealingTween(this, cardList, this.zoneTop);
 
         console.log('deal stone');
         break;
     }
   }
 
-  // Phaser.GameObjects.Group.shiftPosition(x, y, direction): 
+  // Phaser.GameObjects.Group.shiftPosition(x, y, direction):
   // Phaser.Actions.ShiftPosition(items, x, y, direction, output):
   // width = 52px
   // height = 76px
@@ -128,7 +133,7 @@ export class OkeyScene extends Phaser.Scene {
       stone.setInteractive({ draggable: true, useHandCursor: true });
       this.deck.push(stone);
 
-      //? ----- object events ------ 
+      //? ----- object events ------
       stone.on('drag', (pointer, dragX, dragY) => {
         this.handleDragEvents('drag', pointer, stone, dragX, dragY, null);
       });
@@ -137,11 +142,9 @@ export class OkeyScene extends Phaser.Scene {
         this.handleDragEvents('dragend', pointer, stone, dragX, dragY, dropped);
       });
 
-
       stone.on('dragstart', (pointer, dragX, dragY) => {
         this.handleDragEvents('dragstart', pointer, stone, dragX, dragY, null);
       });
-
 
       //? ------- drag events ------
       this.input.on('dragenter', (pointer, gameObject, dropZone) => {
@@ -154,12 +157,10 @@ export class OkeyScene extends Phaser.Scene {
         // console.log(`dragenter >> target: ${this.targetDropZone?.getData('isOccupied')} | last: ${this.lastDropZone?.getData('isOccupied')}`);
       });
 
-
       stone.on('pointerup', (pointer, localX, localY) => {
         // console.log('pointerup ', this.lastDropZone?.name);
         this.handleDropEvent(pointer, stone, this.targetDropZone);
       });
-
     }
   }
 
@@ -172,8 +173,8 @@ export class OkeyScene extends Phaser.Scene {
         break;
       case 'dragend':
         // if (!dropped) {
-        // not dropped 
-        // tweenPosition(this, gameObject, {x: gameObject.input.dragStartX, y: gameObject.input.dragStartY}); 
+        // not dropped
+        // tweenPosition(this, gameObject, {x: gameObject.input.dragStartX, y: gameObject.input.dragStartY});
         // }
         gameObject.angle = 0;
         gameObject.setScale(1);
@@ -198,7 +199,7 @@ export class OkeyScene extends Phaser.Scene {
       gameObject.x = dropZone.x;
       gameObject.y = dropZone.y;
       dropZone.setData('isOccupied', true);
-      dropZone.setData('isOccupied', gameObject);
+      dropZone.setData('data', gameObject);
 
       if (this.lastDropZone && this.lastDropZone !== this.targetDropZone) {
         this.lastDropZone.setData('isOccupied', false);
@@ -206,11 +207,11 @@ export class OkeyScene extends Phaser.Scene {
         this.lastDropZone = null;
       }
 
-      const zone = this.determineZoneType(dropZone.name) === 'top' ? this.zoneTop : this.zoneBottom;
-      this.checkGroup(zone, dropZone);
+      const zoneList = this.determineZoneType(dropZone.name) === 'top' ? this.zoneTop : this.zoneBottom;
+      this.checkGroup(zoneList, dropZone);
       // console.log(`after >> target: ${dropZone?.getData('isOccupied')} | last: ${this.lastDropZone?.getData('isOccupied')}`);
     } else {
-      // when the drop zone is already occupied / or invalid 
+      // when the drop zone is already occupied / or invalid
       tweenPosition(this, gameObject, { x: gameObject.input.dragStartX, y: gameObject.input.dragStartY });
       this.lastDropZone = null;
       this.targetDropZone = null;
@@ -219,8 +220,97 @@ export class OkeyScene extends Phaser.Scene {
   }
 
   checkGroup(zones: Phaser.GameObjects.Zone[], targetZone: Phaser.GameObjects.Zone) {
-    const targetIndex = zones.findIndex(zone => zone.name === targetZone.name);
+    const groupedCardsByColor = {
+      black: [],
+      blue: [],
+      red: [],
+      yellow: [],
+    };
+
+    const targetIndex = zones.findIndex((zone) => zone.name === targetZone.name);
     console.log('target ', targetIndex);
+
+    const allGroups = [];
+    let group = [];
+
+    // Iterate from targetIndex to the end of the list
+    for (let i = targetIndex; i < zones.length; i++) {
+      const zone = zones[i];
+      if (zone.getData('isOccupied') === true) {
+        const card = zone.getData('data');
+        group.push(card);
+        // console.log('zone is occupied');
+      } else {
+        // console.log('zone is not occupied');
+        if (group.length < 3) group = [];
+        else {
+          // found adjacent group check validity
+          allGroups.push(group);
+          group = [];
+        }
+        break;
+      }
+    }
+
+    if (group.length >= 3) {
+      allGroups.push(group);
+    }
+
+    const validGroupToCheck = []; //[{}]
+    if (allGroups.length > 0) {
+      allGroups[0].forEach((item) => {
+        const obj = parseOkeyData(item.name);
+        validGroupToCheck.push(obj);
+      });
+    }
+
+    this.okeyLabel.forEach((label) => {
+      groupedCardsByColor[label] = _.filter(validGroupToCheck, (item) => {
+        return item.label == label;
+      });
+    });
+
+    console.log(this.filterConsecutiveCards(validGroupToCheck));
+    // console.log(validGroupToCheck);
+
+    // Iterate from targetIndex to the start of the list
+    // for (let i = targetIndex - 1; i >= 0; i--) {
+    //   const zone = zones[i];
+    //   // console.log(card.name, card.value);
+    // }
+  }
+
+  filterConsecutiveCards(cards) {
+    // Check if the input list is empty or contains only one card
+    if (cards.length < 3) {
+      return [];
+    }
+
+    const groupedCards = _.groupBy(cards, 'label');
+    const subsets = [];
+  
+    for (const label in groupedCards) {
+      const group = groupedCards[label];
+      const sortedGroup = _.sortBy(group, 'value');
+  
+      let consecutiveSubset = [sortedGroup[0]];
+      for (let i = 1; i < sortedGroup.length; i++) {
+        if (sortedGroup[i].value === sortedGroup[i - 1].value + 1) {
+          consecutiveSubset.push(sortedGroup[i]);
+        } else {
+          if (consecutiveSubset.length >= 3) {
+            subsets.push(consecutiveSubset);
+          }
+          consecutiveSubset = [sortedGroup[i]];
+        }
+      }
+  
+      if (consecutiveSubset.length >= 3) {
+        subsets.push(consecutiveSubset);
+      }
+    }
+  
+    return _.flatten(subsets);
   }
 
   determineZoneType(zoneName: string) {
@@ -228,7 +318,6 @@ export class OkeyScene extends Phaser.Scene {
       return 'top';
     } else {
       return 'bottom';
-    } 
+    }
   }
-
 }
