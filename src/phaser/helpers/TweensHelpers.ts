@@ -149,6 +149,7 @@ export const okeyDealingTween = (context: Phaser.Scene, cardList: Phaser.GameObj
       tweenPosition(context, card, { x, y }, {angle: { from: 180, to: 0 }, delay: index * 100, duration: 600});
       // console.log('true ');
       zone.setData('isOccupied', true);
+      zone.setData('data', card);
     }
   });
 };
@@ -177,4 +178,10 @@ export const createDropZone = (context: Phaser.Scene, pos: vector2, debug=false)
     graphics.strokeRect(zone.x - zone.input.hitArea.width / 2, zone.y - zone.input.hitArea.height / 2, zone.input.hitArea.width, zone.input.hitArea.height);
   }
   return zone;
+};
+
+export const parseOkeyData = (data: string) => {
+  const label = data.split('_')[0]; 
+  const value = parseInt(data.split('_')[1]); // 
+  return { label: label, value: value };
 };
