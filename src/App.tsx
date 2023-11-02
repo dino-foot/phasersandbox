@@ -48,7 +48,7 @@ function App() {
   }, [gameStarted, selectedScene]);
 
   if (isDevelopment && !gameStarted) {
-    startGame('Scopa'); // start with 'Scopa' scene in development mode
+    startGame('Okey'); // start with 'Scopa'/Okey scene in development mode
   }
 
   return (

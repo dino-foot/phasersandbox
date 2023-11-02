@@ -11,7 +11,7 @@ import {
   tweenBounceScaleUp
 } from '../helpers';
 import { scopaDeck } from '../constants';
-import { GameSettings } from './GameSettings';
+import { TextSettings } from '../settings/TextSettings';
 
 export class ScopaScene extends Phaser.Scene {
   deck: Card[] = [];
@@ -41,7 +41,7 @@ export class ScopaScene extends Phaser.Scene {
   }
 
   create() {
-    this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'bg').setOrigin(0.5);
+    this.add.image(this.centerX, this.centerY, 'bg').setOrigin(0.5).setScale(3);
 
     //? create deck
     this.createDeck();
@@ -52,21 +52,17 @@ export class ScopaScene extends Phaser.Scene {
     // card distribute tween
     // variation A
     // variation B
-    // card selection effect
     // card place/show tween
-    // card match tween (placed 1 card, matched with 2 card)
-    // card match fx
-    // scopa win fx
     // settabello win fx
   }
 
   createUI() {
-    this.resetButton = PhaserHelpers.addText(GameSettings.RESET, this);
-    this.shineFXBtn = PhaserHelpers.addText(GameSettings.SHINE, this);
-    this.glowFXBtn = PhaserHelpers.addText(GameSettings.GLOW, this);
-    this.dealCards = PhaserHelpers.addText(GameSettings.DEAL_CARDS, this);
-    this.scopaFXBtn = PhaserHelpers.addText(GameSettings.SCOPA_FX, this);
-    this.cardMathBtn = PhaserHelpers.addText(GameSettings.CARD_MATCH, this);
+    this.resetButton = PhaserHelpers.addText(TextSettings.RESET, this);
+    this.shineFXBtn = PhaserHelpers.addText(TextSettings.SHINE, this);
+    this.glowFXBtn = PhaserHelpers.addText(TextSettings.GLOW, this);
+    this.dealCards = PhaserHelpers.addText(TextSettings.DEAL_CARDS, this);
+    this.scopaFXBtn = PhaserHelpers.addText(TextSettings.SCOPA_FX, this);
+    this.cardMathBtn = PhaserHelpers.addText(TextSettings.CARD_MATCH, this);
 
     this.resetButton.on('pointerdown', () => { this.handleUIEvents('RESET'); }, this);
     this.dealCards.on('pointerdown', () => { this.handleUIEvents('DEAL CARDS'); }, this);
@@ -91,10 +87,7 @@ export class ScopaScene extends Phaser.Scene {
 
     switch (type) {
       case 'RESET':
-        this.deck.forEach((card: Card) => {
-          card.destroy();
-        });
-        this.createDeck();
+        this.scene.restart();
         break;
 
       case 'DEAL CARDS':

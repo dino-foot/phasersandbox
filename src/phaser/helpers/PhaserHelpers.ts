@@ -1,4 +1,4 @@
-import * as Phaser from "phaser";
+import * as Phaser from 'phaser';
 import { ItemData, RectData, TextObject } from '../types';
 
 export class PhaserHelpers {
@@ -82,7 +82,7 @@ export class PhaserHelpers {
     if (name) rect.setName(name);
 
     if (debugFill) {
-      const rectShape = new Phaser.Geom.Rectangle(x || 0, y || 0, width || 0, height || 0);
+      const rectShape = new Phaser.Geom.Rectangle(x - width/2 || 0, y - height/2 || 0, width || 0, height || 0);
       const graphics = context.add.graphics();
       graphics.fillRectShape(rectShape).fillStyle(0xffffff);
       graphics.setName('mask');

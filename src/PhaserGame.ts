@@ -4,14 +4,14 @@ import Phaser from 'phaser';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
-  width: '100%',
-  height: '100%',
+  width: 1920,
+  height: 1080,
   parent: 'phaser-container',
   backgroundColor: '#282c34',
   pixelArt: true,
   antialias: true,
   scale: {
-    mode: Phaser.Scale.ScaleModes.RESIZE,
+    mode: Phaser.Scale.ScaleModes.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
   // scene: [PreloadScene, ScopaScene, OkeyScene],

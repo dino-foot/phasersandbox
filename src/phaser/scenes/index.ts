@@ -1,4 +1,4 @@
 export * from './PreloadScene';
 export * from './ScopaScene';
 export * from './OkeyScene';
-export * from './GameSettings';
+export * from '../settings/TextSettings';
