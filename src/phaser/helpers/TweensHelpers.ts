@@ -179,9 +179,3 @@ export const createDropZone = (context: Phaser.Scene, pos: vector2, debug=false)
   }
   return zone;
 };
-
-export const parseOkeyData = (data: string) => {
-  const label = data.split('_')[0]; 
-  const value = parseInt(data.split('_')[1]); // 
-  return { label: label, value: value };
-};

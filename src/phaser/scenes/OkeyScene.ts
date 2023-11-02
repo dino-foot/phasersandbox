@@ -79,7 +79,7 @@ export class OkeyScene extends Phaser.Scene {
 
   // todo
   // stone dealing (done)
-  // stones grouping 
+  //? stones grouping (wip)
   //? implement desktop drag and drop individual stone (wip)
   // implement desktop drag and drop grouped stones.  The "group move" button appears when you hover on a group.
   // implement mobile drag and drop individual stone
@@ -97,7 +97,7 @@ export class OkeyScene extends Phaser.Scene {
 
     switch (type) {
       case 'DEAL STONE':
-        const cardList = _.sampleSize(this.deck, 13);
+        const cardList = _.sampleSize(this.deck, 24);
         _.pullAll(this.deck, cardList);
 
         okeyDealingTween(this, cardList, this.zoneList);
@@ -206,8 +206,6 @@ export class OkeyScene extends Phaser.Scene {
         this.lastDropZone = null;
       }
 
-      const zone = this.determineZoneType(dropZone.name) === 'top' ? this.zoneTop : this.zoneBottom;
-      this.checkGroup(zone, dropZone);
       // console.log(`after >> target: ${dropZone?.getData('isOccupied')} | last: ${this.lastDropZone?.getData('isOccupied')}`);
     } else {
       // when the drop zone is already occupied / or invalid 
@@ -218,10 +216,6 @@ export class OkeyScene extends Phaser.Scene {
     // console.log(`after >> target: ${dropZone?.getData('isOccupied')} | last: ${this.lastDropZone?.getData('isOccupied')}`);
   }
 
-  checkGroup(zones: Phaser.GameObjects.Zone[], targetZone: Phaser.GameObjects.Zone) {
-    const targetIndex = zones.findIndex(zone => zone.name === targetZone.name);
-    console.log('target ', targetIndex);
-  }
 
   determineZoneType(zoneName: string) {
     if (zoneName.includes('zone_top')) {
@@ -229,6 +223,12 @@ export class OkeyScene extends Phaser.Scene {
     } else {
       return 'bottom';
     } 
+  }
+
+  parseOkeyData(data: string) {
+    const label = data.split('_')[0];
+    const value = parseInt(data.split('_')[1]); // 
+    return { label: label, value: value };
   }
 
 }
