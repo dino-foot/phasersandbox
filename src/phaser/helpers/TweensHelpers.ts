@@ -12,14 +12,15 @@ export const shuffleCards_A = (context: Phaser.Scene, cardList: Card[], pos: vec
         targets: cardList,
         x: (a, b, c, d) => pos.x + 85 * d,
         y: pos.y,
-        duration: 400,
+        duration: 500,
+        angle: { from: 180, to: 0 },
         delay: context.tweens.stagger(100, { start: 0 }),
         ease: Phaser.Math.Easing.Sine.Out,
       },
       {
         targets: cardList,
         props: {
-          scaleX: { value: 0, duration: 200, yoyo: true },
+          scaleX: { value: 0, duration: 300, yoyo: true },
         },
         onYoyo: (tween: Phaser.Tweens.Tween, target: Card) => {
           target.setTexture(target.cardValue);

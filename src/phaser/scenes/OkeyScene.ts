@@ -25,6 +25,7 @@ export class OkeyScene extends Phaser.Scene {
   zoneBottom: Phaser.GameObjects.Zone[];
   cardWidth = 52;
   cardHeight = 76;
+  resetButton: Phaser.GameObjects.Text;
   constructor() {
     super('okey');
   }
@@ -61,7 +62,7 @@ export class OkeyScene extends Phaser.Scene {
       const zone = createDropZone(this, { x: this.topStartX + i * this.cardWidth, y: this.topStartY }, true);
       zone.setName(`zone_top_${i}`);
       zone.setData('isOccupied', false);
-      this.zoneTop.push(zone);
+      // this.zoneTop.push(zone);
       this.zoneList.push(zone);
     }
 
@@ -69,7 +70,7 @@ export class OkeyScene extends Phaser.Scene {
       const zone = createDropZone(this, { x: this.bottomStartX + i * this.cardWidth, y: this.bottomStartY }, true);
       zone.setName(`zone_bottom_${i}`);
       zone.setData('isOccupied', false);
-      this.zoneBottom.push(zone);
+      // this.zoneBottom.push(zone);
       this.zoneList.push(zone);
     }
 
@@ -89,20 +90,23 @@ export class OkeyScene extends Phaser.Scene {
 
   create() {
     this.dealStone = PhaserHelpers.addText(TextSettings.DEAL_CARDS, this);
+    this.resetButton = PhaserHelpers.addText(TextSettings.RESET, this);
+
     this.dealStone.on('pointerdown', () => { this.handleUIEvents('DEAL STONE'); }, this);
+    this.resetButton.on('pointerdown', () => { this.handleUIEvents('RESET'); }, this);
   }
 
-  handleUIEvents(type: 'DEAL STONE') {
-    if (this.deck.length < 0) this.createDeck();
+  handleUIEvents(type: 'RESET' | 'DEAL STONE') {
+    // if (this.deck.length < 0) this.createDeck();
 
     switch (type) {
       case 'DEAL STONE':
         const cardList = _.sampleSize(this.deck, 24);
         _.pullAll(this.deck, cardList);
-
         okeyDealingTween(this, cardList, this.zoneList);
-
-        console.log('deal stone');
+        break;
+      case 'RESET':
+        this.scene.restart();
         break;
     }
   }
@@ -122,24 +126,24 @@ export class OkeyScene extends Phaser.Scene {
       const labelIndex = Math.floor(i / 13);
       const stoneNumber = (i % 13) + 1;
 
-      const stone = this.add.image(posX, posY, 'okey-stones', i);
-      stone.depth = 10;
-      stone.setName(`${this.okeyLabel[labelIndex]}_${stoneNumber}`);
-      stone.setInteractive({ draggable: true, useHandCursor: true });
-      this.deck.push(stone);
+      const card = this.add.image(posX, posY, 'okey-stones', i);
+      card.depth = 10;
+      card.setName(`${this.okeyLabel[labelIndex]}_${stoneNumber}`);
+      card.setInteractive({ draggable: true, useHandCursor: true });
+      this.deck.push(card);
 
       //? ----- object events ------ 
-      stone.on('drag', (pointer, dragX, dragY) => {
-        this.handleDragEvents('drag', pointer, stone, dragX, dragY, null);
+      card.on('drag', (pointer, dragX, dragY) => {
+        this.handleDragEvents('drag', pointer, card, dragX, dragY, null);
       });
 
-      stone.on('dragend', (pointer, dragX, dragY, dropped) => {
-        this.handleDragEvents('dragend', pointer, stone, dragX, dragY, dropped);
+      card.on('dragend', (pointer, dragX, dragY, dropped) => {
+        this.handleDragEvents('dragend', pointer, card, dragX, dragY, dropped);
       });
 
 
-      stone.on('dragstart', (pointer, dragX, dragY) => {
-        this.handleDragEvents('dragstart', pointer, stone, dragX, dragY, null);
+      card.on('dragstart', (pointer, dragX, dragY) => {
+        this.handleDragEvents('dragstart', pointer, card, dragX, dragY, null);
       });
 
 
@@ -155,9 +159,9 @@ export class OkeyScene extends Phaser.Scene {
       });
 
 
-      stone.on('pointerup', (pointer, localX, localY) => {
+      card.on('pointerup', (pointer, localX, localY) => {
         // console.log('pointerup ', this.lastDropZone?.name);
-        this.handleDropEvent(pointer, stone, this.targetDropZone);
+        this.handleDropEvent(pointer, card, this.targetDropZone);
       });
 
     }
