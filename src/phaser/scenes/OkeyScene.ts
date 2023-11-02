@@ -102,10 +102,14 @@ export class OkeyScene extends Phaser.Scene {
 
     switch (type) {
       case 'DEAL STONE':
-        const cardList = _.sampleSize(this.deck, 34);
-        _.pullAll(this.deck, cardList);
+        let cardListA = _.sampleSize(this.deck, 12);
+        _.pullAll(this.deck, cardListA);
 
-        okeyDealingTween(this, cardList, this.zoneTop);
+        let cardListB = _.sampleSize(this.deck, 12);
+        _.pullAll(this.deck, cardListB);
+
+        okeyDealingTween(this, cardListA, this.zoneTop);
+        okeyDealingTween(this, cardListB, this.zoneBottom);
 
         console.log('deal stone');
         break;
