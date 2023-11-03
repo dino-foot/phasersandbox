@@ -2,7 +2,7 @@
 /* eslint-disable prefer-const */
 import Phaser from 'phaser';
 import _ from 'lodash';
-import { PhaserHelpers, createDropZone, okeyDealingTween, tweenPosition, } from '../helpers';
+import { PhaserHelpers, createDropZone, determineZoneType, okeyDealingTween, tweenPosition, } from '../helpers';
 import { ShapeSettings } from '../settings/ShapeSettings';
 import { TextSettings } from '../settings/TextSettings';
 
@@ -225,7 +225,7 @@ export class OkeyScene extends Phaser.Scene {
       // console.log(`after >> target: ${dropZone?.getData('isOccupied')} | last: ${this.lastDropZone?.getData('isOccupied')}`);
     } else if (dropZone && dropZone.getData('isOccupied')) {
 
-      const zoneList = this.determineZoneType(dropZone.name) === "top" ? this.zoneTop : this.zoneBottom;
+      const zoneList = determineZoneType(dropZone.name) === "top" ? this.zoneTop : this.zoneBottom;
       // check if there any empty adjacent zone
       const result = this.getShiftableZones(zoneList, dropZone);
       if (result.length > 0) {
@@ -309,20 +309,6 @@ export class OkeyScene extends Phaser.Scene {
     //? merge as group and drag and drop func
     
     // console.log(validGroupToCheck);
-  }
-
-  determineZoneType(zoneName: string) {
-    if (zoneName.includes('zone_top')) {
-      return 'top';
-    } else {
-      return 'bottom';
-    }
-  }
-
-  parseOkeyData(data: string) {
-    const label = data.split('_')[0];
-    const value = parseInt(data.split('_')[1]); // 
-    return { label: label, value: value };
   }
 
 }

@@ -145,7 +145,7 @@ export const tweenBounceScaleUp = (context: Phaser.Scene, targets: Phaser.GameOb
 export const okeyDealingTween = (context: Phaser.Scene, cardList: Phaser.GameObjects.Image[], zoneList: Phaser.GameObjects.Zone[]) => {
   cardList.forEach((card, index) => {
     const zone = zoneList[index];
-    const { x, y } = zone;
+    const { x, y } = zone; // get zone position 
     if (zone.getData('isOccupied') === false) {
       tweenPosition(context, card, { x, y }, {angle: { from: 180, to: 0 }, delay: index * 100, duration: 600});
       // console.log('true ');
