@@ -12,14 +12,15 @@ export const shuffleCards_A = (context: Phaser.Scene, cardList: Card[], pos: vec
         targets: cardList,
         x: (a, b, c, d) => pos.x + 85 * d,
         y: pos.y,
-        duration: 400,
+        duration: 500,
+        angle: { from: 180, to: 0 },
         delay: context.tweens.stagger(100, { start: 0 }),
         ease: Phaser.Math.Easing.Sine.Out,
       },
       {
         targets: cardList,
         props: {
-          scaleX: { value: 0, duration: 200, yoyo: true },
+          scaleX: { value: 0, duration: 300, yoyo: true },
         },
         onYoyo: (tween: Phaser.Tweens.Tween, target: Card) => {
           target.setTexture(target.cardValue);
@@ -178,10 +179,4 @@ export const createDropZone = (context: Phaser.Scene, pos: vector2, debug=false)
     graphics.strokeRect(zone.x - zone.input.hitArea.width / 2, zone.y - zone.input.hitArea.height / 2, zone.input.hitArea.width, zone.input.hitArea.height);
   }
   return zone;
-};
-
-export const parseOkeyData = (data: string) => {
-  const label = data.split('_')[0]; 
-  const value = parseInt(data.split('_')[1]); // 
-  return { label: label, value: value };
 };

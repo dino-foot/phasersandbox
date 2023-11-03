@@ -87,10 +87,7 @@ export class ScopaScene extends Phaser.Scene {
 
     switch (type) {
       case 'RESET':
-        this.deck.forEach((card: Card) => {
-          card.destroy();
-        });
-        this.createDeck();
+        this.scene.restart();
         break;
 
       case 'DEAL CARDS':

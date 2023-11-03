@@ -2,7 +2,7 @@
 /* eslint-disable prefer-const */
 import Phaser from 'phaser';
 import _ from 'lodash';
-import { PhaserHelpers, createDropZone, okeyDealingTween, parseOkeyData, tweenPosition, } from '../helpers';
+import { PhaserHelpers, createDropZone, okeyDealingTween, tweenPosition, } from '../helpers';
 import { ShapeSettings } from '../settings/ShapeSettings';
 import { TextSettings } from '../settings/TextSettings';
 
@@ -25,6 +25,7 @@ export class OkeyScene extends Phaser.Scene {
   zoneBottom: Phaser.GameObjects.Zone[];
   cardWidth = 52;
   cardHeight = 76;
+  resetButton: Phaser.GameObjects.Text;
   constructor() {
     super('okey');
   }
@@ -88,17 +89,14 @@ export class OkeyScene extends Phaser.Scene {
 
   create() {
     this.dealStone = PhaserHelpers.addText(TextSettings.DEAL_CARDS, this);
-    this.dealStone.on(
-      'pointerdown',
-      () => {
-        this.handleUIEvents('DEAL STONE');
-      },
-      this
-    );
+    this.resetButton = PhaserHelpers.addText(TextSettings.RESET, this);
+
+    this.dealStone.on('pointerdown', () => { this.handleUIEvents('DEAL STONE'); }, this);
+    this.resetButton.on('pointerdown', () => { this.handleUIEvents('RESET'); }, this);
   }
 
-  handleUIEvents(type: 'DEAL STONE') {
-    if (this.deck.length < 0) this.createDeck();
+  handleUIEvents(type: 'RESET' | 'DEAL STONE') {
+    // if (this.deck.length < 0) this.createDeck();
 
     switch (type) {
       case 'DEAL STONE':
@@ -113,6 +111,10 @@ export class OkeyScene extends Phaser.Scene {
 
         console.log('deal stone');
         break;
+      case 'RESET':
+        case 'RESET':
+        this.scene.restart();
+        break;        
     }
   }
 
@@ -131,23 +133,24 @@ export class OkeyScene extends Phaser.Scene {
       const labelIndex = Math.floor(i / 13);
       const stoneNumber = (i % 13) + 1;
 
-      const stone = this.add.image(posX, posY, 'okey-stones', i);
-      stone.depth = 10;
-      stone.setName(`${this.okeyLabel[labelIndex]}_${stoneNumber}`);
-      stone.setInteractive({ draggable: true, useHandCursor: true });
-      this.deck.push(stone);
+      const card = this.add.image(posX, posY, 'okey-stones', i);
+      card.depth = 10;
+      card.setName(`${this.okeyLabel[labelIndex]}_${stoneNumber}`);
+      card.setInteractive({ draggable: true, useHandCursor: true });
+      this.deck.push(card);
 
-      //? ----- object events ------
-      stone.on('drag', (pointer, dragX, dragY) => {
-        this.handleDragEvents('drag', pointer, stone, dragX, dragY, null);
+      //? ----- object events ------ 
+      card.on('drag', (pointer, dragX, dragY) => {
+        this.handleDragEvents('drag', pointer, card, dragX, dragY, null);
       });
 
-      stone.on('dragend', (pointer, dragX, dragY, dropped) => {
-        this.handleDragEvents('dragend', pointer, stone, dragX, dragY, dropped);
+      card.on('dragend', (pointer, dragX, dragY, dropped) => {
+        this.handleDragEvents('dragend', pointer, card, dragX, dragY, dropped);
       });
 
-      stone.on('dragstart', (pointer, dragX, dragY) => {
-        this.handleDragEvents('dragstart', pointer, stone, dragX, dragY, null);
+
+      card.on('dragstart', (pointer, dragX, dragY) => {
+        this.handleDragEvents('dragstart', pointer, card, dragX, dragY, null);
       });
 
       //? ------- drag events ------
@@ -161,9 +164,10 @@ export class OkeyScene extends Phaser.Scene {
         // console.log(`dragenter >> target: ${this.targetDropZone?.getData('isOccupied')} | last: ${this.lastDropZone?.getData('isOccupied')}`);
       });
 
-      stone.on('pointerup', (pointer, localX, localY) => {
+
+      card.on('pointerup', (pointer, localX, localY) => {
         // console.log('pointerup ', this.lastDropZone?.name);
-        this.handleDropEvent(pointer, stone, this.targetDropZone);
+        this.handleDropEvent(pointer, card, this.targetDropZone);
       });
     }
   }
@@ -260,4 +264,11 @@ export class OkeyScene extends Phaser.Scene {
       return 'bottom';
     }
   }
+
+  parseOkeyData(data: string) {
+    const label = data.split('_')[0];
+    const value = parseInt(data.split('_')[1]); // 
+    return { label: label, value: value };
+  }
+
 }
