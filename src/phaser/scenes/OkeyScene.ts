@@ -103,7 +103,7 @@ export class OkeyScene extends Phaser.Scene {
         let cardListA = _.sampleSize(this.deck, 12);
         _.pullAll(this.deck, cardListA);
 
-        let cardListB = _.sampleSize(this.deck, 12);
+        let cardListB = _.sampleSize(this.deck, 6);
         _.pullAll(this.deck, cardListB);
 
         okeyDealingTween(this, cardListA, this.zoneTop);
@@ -120,6 +120,16 @@ export class OkeyScene extends Phaser.Scene {
 
   // Phaser.GameObjects.Group.shiftPosition(x, y, direction):
   // Phaser.Actions.ShiftPosition(items, x, y, direction, output):
+//   const group = this.add.group({
+//     key: 'diamonds',
+//     frame: [ 0, 1, 2, 3, 4 ],
+//     setXY:
+//     {
+//         x: 100,
+//         y: 100,
+//         stepX: 64
+//     }
+// });
   // width = 52px
   // height = 76px
   // platform width = 52x12 = 624 (max=12 stone)
@@ -161,6 +171,7 @@ export class OkeyScene extends Phaser.Scene {
           // console.log('last ', this.lastDropZone?.name);
         }
         // console.log('dragenter ', this.lastDropZone?.name, dropZone.name);
+        // console.log('dragenter ', dropZone.name);
         // console.log(`dragenter >> target: ${this.targetDropZone?.getData('isOccupied')} | last: ${this.lastDropZone?.getData('isOccupied')}`);
       });
 
@@ -180,10 +191,6 @@ export class OkeyScene extends Phaser.Scene {
         gameObject.y = dragY;
         break;
       case 'dragend':
-        // if (!dropped) {
-        // not dropped
-        // tweenPosition(this, gameObject, {x: gameObject.input.dragStartX, y: gameObject.input.dragStartY});
-        // }
         gameObject.angle = 0;
         gameObject.setScale(1);
         gameObject.depth -= 1;
@@ -204,8 +211,7 @@ export class OkeyScene extends Phaser.Scene {
     // console.log(`before >> target: ${dropZone?.getData('isOccupied')} | last: ${this.lastDropZone?.getData('isOccupied')}`);
 
     if (dropZone && !dropZone.getData('isOccupied')) {
-      gameObject.x = dropZone.x;
-      gameObject.y = dropZone.y;
+      gameObject.setPosition(dropZone.x, dropZone.y);
       dropZone.setData('isOccupied', true);
       dropZone.setData('data', gameObject);
 
@@ -215,17 +221,65 @@ export class OkeyScene extends Phaser.Scene {
         this.lastDropZone = null;
       }
 
-      const zoneList = this.determineZoneType(dropZone.name) === 'top' ? this.zoneTop : this.zoneBottom;
-      this.checkGroup(zoneList, dropZone);
+  
       // console.log(`after >> target: ${dropZone?.getData('isOccupied')} | last: ${this.lastDropZone?.getData('isOccupied')}`);
+    } else if (dropZone && dropZone.getData('isOccupied')) {
+
+      const zoneList = this.determineZoneType(dropZone.name) === "top" ? this.zoneTop : this.zoneBottom;
+      // check if there any empty adjacent zone
+      const result = this.getShiftableZones(zoneList, dropZone);
+      if (result.length > 0) {
+        result.unshift(dropZone);
+        // const cardObjects = result.map(zone => zone.getData('data'));
+
+        const targetIndex = zoneList.findIndex((zone) => zone.name === dropZone.name);
+
+        for (let i = targetIndex; i < targetIndex + result.length; i++) {
+          console.log('res', i);
+          const card = zoneList[i].getData('data');
+          tweenPosition(this, card, { x: zoneList[i + 1].x, y: zoneList[i + 1].y });
+        }
+
+        gameObject.setPosition(dropZone.x, dropZone.y);
+        console.log(`targetIndex ${targetIndex} result ${result.length}`);
+      }
+      this.lastDropZone = null;
+      this.targetDropZone = null;
     } else {
-      // when the drop zone is already occupied / or invalid
+      // when the drop zone is invalid
       tweenPosition(this, gameObject, { x: gameObject.input.dragStartX, y: gameObject.input.dragStartY });
       this.lastDropZone = null;
       this.targetDropZone = null;
     }
     // console.log(`after >> target: ${dropZone?.getData('isOccupied')} | last: ${this.lastDropZone?.getData('isOccupied')}`);
   }
+
+  // check if there any empty slot
+  // return the list of target to first un-occupied zone
+  getShiftableZones(zones, targetZone) {
+    const targetIndex = zones.findIndex((zone) => zone.name === targetZone.name);
+    const shiftZones = [];
+
+    // Check right adjacent zones
+    for (let i = targetIndex + 1; i < zones.length; i++) {
+      if (!zones[i].getData('isOccupied')) {
+        return shiftZones; // Return the list of zones from target to first unoccupied zone
+      }
+      shiftZones.push(zones[i]);
+    }
+
+    // Check left adjacent zones
+    for (let i = targetIndex - 1; i >= 0; i--) {
+      if (!zones[i].getData('isOccupied')) {
+        return shiftZones.reverse(); // Return the list of zones from target to first unoccupied zone
+      }
+      shiftZones.push(zones[i]);
+    }
+
+    return shiftZones.reverse(); // Return the entire list if all zones are occupied
+  }
+
+
 
   checkGroup(zones: Phaser.GameObjects.Zone[], targetZone: Phaser.GameObjects.Zone) {
 
@@ -235,7 +289,7 @@ export class OkeyScene extends Phaser.Scene {
 
     const rightAdjacentCards = _.chain(zones)
       .slice(targetIndex)
-      .takeWhile(zone => zone.getData('isOccupied') === true)
+      .takeWhile(zone => zone.getData('isOccupied') === false)
       .map(zone => zone.getData('data'))
       .value();
 
@@ -251,7 +305,7 @@ export class OkeyScene extends Phaser.Scene {
     adjacentCards = _.concat(leftAdjacentCards.reverse(), rightAdjacentCards);
 
     console.log('target ', adjacentCards);
-    // todo if group size is = 3 or 3>
+    //? todo if group size is = 3 or 3>
     //? merge as group and drag and drop func
     
     // console.log(validGroupToCheck);
