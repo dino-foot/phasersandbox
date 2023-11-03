@@ -2,7 +2,7 @@
 /* eslint-disable prefer-const */
 import Phaser from 'phaser';
 import _ from 'lodash';
-import { PhaserHelpers, createDropZone, determineZoneType, okeyDealingTween, tweenPosition, } from '../helpers';
+import { PhaserHelpers, createDropZone, determineZoneType, getShiftableZones, okeyDealingTween, tweenPosition, } from '../helpers';
 import { ShapeSettings } from '../settings/ShapeSettings';
 import { TextSettings } from '../settings/TextSettings';
 
@@ -210,105 +210,51 @@ export class OkeyScene extends Phaser.Scene {
   handleDropEvent(pointer, gameObject, dropZone) {
     // console.log(`before >> target: ${dropZone?.getData('isOccupied')} | last: ${this.lastDropZone?.getData('isOccupied')}`);
 
-    if (dropZone && !dropZone.getData('isOccupied')) {
-      gameObject.setPosition(dropZone.x, dropZone.y);
-      dropZone.setData('isOccupied', true);
-      dropZone.setData('data', gameObject);
-
-      if (this.lastDropZone && this.lastDropZone !== this.targetDropZone) {
-        this.lastDropZone.setData('isOccupied', false);
-        this.lastDropZone.setData('data', null);
-        this.lastDropZone = null;
-      }
-
-  
-      // console.log(`after >> target: ${dropZone?.getData('isOccupied')} | last: ${this.lastDropZone?.getData('isOccupied')}`);
-    } else if (dropZone && dropZone.getData('isOccupied')) {
-
-      const zoneList = determineZoneType(dropZone.name) === "top" ? this.zoneTop : this.zoneBottom;
-      // check if there any empty adjacent zone
-      const result = this.getShiftableZones(zoneList, dropZone);
-      if (result.length > 0) {
-        result.unshift(dropZone);
-        // const cardObjects = result.map(zone => zone.getData('data'));
-
-        const targetIndex = zoneList.findIndex((zone) => zone.name === dropZone.name);
-
-        for (let i = targetIndex; i < targetIndex + result.length; i++) {
-          console.log('res', i);
-          const card = zoneList[i].getData('data');
-          tweenPosition(this, card, { x: zoneList[i + 1].x, y: zoneList[i + 1].y });
-        }
-
+    if (dropZone) {
+      if (!dropZone.getData('isOccupied')) {
+        // empty zone
         gameObject.setPosition(dropZone.x, dropZone.y);
-        console.log(`targetIndex ${targetIndex} result ${result.length}`);
+        dropZone.setData('isOccupied', true);
+        dropZone.setData('data', gameObject);
+
+        if (this.lastDropZone && this.lastDropZone !== this.targetDropZone) {
+          this.lastDropZone.setData('isOccupied', false);
+          this.lastDropZone.setData('data', null);
+          this.lastDropZone = null;
+        }
+      } else {
+        // occupied zone
+        const zoneList = determineZoneType(dropZone.name) === "top" ? this.zoneTop : this.zoneBottom;
+        // check if there any empty adjacent zone
+        const result = getShiftableZones(zoneList, dropZone);
+        if (result.length > 0) {
+          result.unshift(dropZone);
+          // const cardObjects = result.map(zone => zone.getData('data'));
+
+          const targetIndex = zoneList.findIndex((zone) => zone.name === dropZone.name);
+
+          for (let i = targetIndex; i < targetIndex + result.length; i++) {
+            console.log('index >> ', i);
+            const card = zoneList[i].getData('data');
+            tweenPosition(this, card, { x: zoneList[i + 1].x, y: zoneList[i + 1].y });
+          }
+
+          gameObject.setPosition(dropZone.x, dropZone.y);
+          console.log(`targetIndex ${targetIndex} result ${result.length}`);
+        }
+        this.resetZone();
       }
-      this.lastDropZone = null;
-      this.targetDropZone = null;
     } else {
-      // when the drop zone is invalid
+      // invalid zone
       tweenPosition(this, gameObject, { x: gameObject.input.dragStartX, y: gameObject.input.dragStartY });
-      this.lastDropZone = null;
-      this.targetDropZone = null;
+      this.resetZone();
     }
     // console.log(`after >> target: ${dropZone?.getData('isOccupied')} | last: ${this.lastDropZone?.getData('isOccupied')}`);
   }
 
-  // check if there any empty slot
-  // return the list of target to first un-occupied zone
-  getShiftableZones(zones, targetZone) {
-    const targetIndex = zones.findIndex((zone) => zone.name === targetZone.name);
-    const shiftZones = [];
-
-    // Check right adjacent zones
-    for (let i = targetIndex + 1; i < zones.length; i++) {
-      if (!zones[i].getData('isOccupied')) {
-        return shiftZones; // Return the list of zones from target to first unoccupied zone
-      }
-      shiftZones.push(zones[i]);
-    }
-
-    // Check left adjacent zones
-    for (let i = targetIndex - 1; i >= 0; i--) {
-      if (!zones[i].getData('isOccupied')) {
-        return shiftZones.reverse(); // Return the list of zones from target to first unoccupied zone
-      }
-      shiftZones.push(zones[i]);
-    }
-
-    return shiftZones.reverse(); // Return the entire list if all zones are occupied
+  resetZone(){
+    this.lastDropZone = null;
+    this.targetDropZone = null;
   }
 
-
-
-  checkGroup(zones: Phaser.GameObjects.Zone[], targetZone: Phaser.GameObjects.Zone) {
-
-    const targetIndex = zones.findIndex((zone) => zone.name === targetZone.name);
-    
-    let adjacentCards = [];
-
-    const rightAdjacentCards = _.chain(zones)
-      .slice(targetIndex)
-      .takeWhile(zone => zone.getData('isOccupied') === false)
-      .map(zone => zone.getData('data'))
-      .value();
-
-    // Get left adjacent cards
-    const leftAdjacentCards = _.chain(zones)
-      .slice(0, targetIndex)
-      .reverse()
-      .takeWhile(zone => zone.getData('isOccupied') === true)
-      .map(zone => zone.getData('data'))
-      .value();
-
-    // Concatenate both left and right adjacent cards
-    adjacentCards = _.concat(leftAdjacentCards.reverse(), rightAdjacentCards);
-
-    console.log('target ', adjacentCards);
-    //? todo if group size is = 3 or 3>
-    //? merge as group and drag and drop func
-    
-    // console.log(validGroupToCheck);
-  }
-
-}
+} // end class
