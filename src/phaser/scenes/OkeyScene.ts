@@ -227,20 +227,24 @@ export class OkeyScene extends Phaser.Scene {
         const zoneList = determineZoneType(dropZone.name) === "top" ? this.zoneTop : this.zoneBottom;
         // check if there any empty adjacent zone
         const result = getShiftableZones(zoneList, dropZone);
-        if (result.length > 0) {
-          result.unshift(dropZone);
+        console.log(result);
+        const direction = result.direction;
+        const shiftableZones = result.shiftableZones;
+
+        if (shiftableZones.length > 0) {
+          shiftableZones.unshift(dropZone);
           // const cardObjects = result.map(zone => zone.getData('data'));
 
           const targetIndex = zoneList.findIndex((zone) => zone.name === dropZone.name);
 
-          for (let i = targetIndex; i < targetIndex + result.length; i++) {
+          for (let i = targetIndex; i < targetIndex + shiftableZones.length; i++) {
             console.log('index >> ', i);
             const card = zoneList[i].getData('data');
             tweenPosition(this, card, { x: zoneList[i + 1].x, y: zoneList[i + 1].y });
           }
 
           gameObject.setPosition(dropZone.x, dropZone.y);
-          console.log(`targetIndex ${targetIndex} result ${result.length}`);
+          console.log(`targetIndex ${targetIndex} result ${shiftableZones.length}`);
         }
         this.resetZone();
       }
