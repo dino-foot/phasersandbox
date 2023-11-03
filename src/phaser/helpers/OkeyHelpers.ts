@@ -12,14 +12,16 @@ export function determineZoneType(zoneName: string) {
     }
 }
 
-export function getShiftableZones(zones:Phaser.GameObjects.Zone[], targetZone:Phaser.GameObjects.Zone) {
+export function getShiftableZones(zones:Phaser.GameObjects.Zone[], targetZone:Phaser.GameObjects.Zone): any {
     const targetIndex = zones.findIndex((zone) => zone.name === targetZone.name);
     const shiftZones = [];
+    let direction = null;
 
     // Check right adjacent zones
     for (let i = targetIndex + 1; i < zones.length; i++) {
         if (!zones[i].getData("isOccupied")) {
-            return shiftZones; // Return the list of zones from target to first unoccupied zone
+            direction = 'right';
+            return {shiftableZones: shiftZones.reverse(), direction}; // Return the list of zones from target to first unoccupied zone
         }
         shiftZones.push(zones[i]);
     }
@@ -27,10 +29,11 @@ export function getShiftableZones(zones:Phaser.GameObjects.Zone[], targetZone:Ph
     // Check left adjacent zones
     for (let i = targetIndex - 1; i >= 0; i--) {
         if (!zones[i].getData("isOccupied")) {
-            return shiftZones.reverse(); // Return the list of zones from target to first unoccupied zone
+            direction = 'left';
+            return {shiftableZones: shiftZones.reverse(), direction}; // Return the list of zones from target to first unoccupied zone
         }
         shiftZones.push(zones[i]);
     }
 
-    return shiftZones.reverse(); // Return the entire list if all zones are occupied
+    return {shiftableZones: shiftZones.reverse(), direction}; // Return the entire list if all zones are occupied
 }
