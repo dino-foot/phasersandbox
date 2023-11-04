@@ -2,7 +2,7 @@
 /* eslint-disable prefer-const */
 import Phaser from 'phaser';
 import _ from 'lodash';
-import { PhaserHelpers, createDropZone, determineZoneType, getAdjacentOccupiedZones, okeyDealingTween, tweenCardToPos, tweenPosition, } from '../helpers';
+import { PhaserHelpers, createDropZone, determineZoneType, getAdjacentOccupiedZones, okeyDealingTween, shiftLeftDirection, shiftRightDirection, tweenPosition, } from '../helpers';
 import { ShapeSettings } from '../settings/ShapeSettings';
 import { TextSettings } from '../settings/TextSettings';
 
@@ -242,34 +242,20 @@ export class OkeyScene extends Phaser.Scene {
       //? handle occupied zone
       const zoneList = determineZoneType(dropZone.name) === "top" ? this.zoneTop : this.zoneBottom;
       const { occupiedZones, direction } = getAdjacentOccupiedZones(zoneList, dropZone);
-      console.log({ occupiedZones, direction });
+      
+      // all zones are filled 
+      if (direction === null) {
+        this.handleInvalidZone(gameObject);
+        return;
+      }
+      // console.log({ occupiedZones, direction });
 
       if (occupiedZones.length > 1) {
         const targetIndex = zoneList.findIndex((zone) => zone.name === dropZone.name);
-        if (direction === "right") {
-          for (let i = targetIndex; i < targetIndex + occupiedZones.length; i++) {
-            const card = zoneList[i].getData("data");
-            const nextIndex = i + 1;
-
-            tweenCardToPos(this, card, { x: zoneList[nextIndex].x, y: zoneList[nextIndex].y }, () => {
-              zoneList[nextIndex].setData("data", card);
-              zoneList[nextIndex].setData("isOccupied", true);
-            });
-          }
-          this.assignToZone(gameObject, dropZone);
-          this.resetZone();
-        } else if (direction === "left") {
-          for (let i = targetIndex; i > targetIndex - occupiedZones.length; i--) {
-            const card = zoneList[i].getData("data");
-            const nextIndex = i - 1;
-
-            tweenCardToPos(this, card, { x: zoneList[nextIndex].x, y: zoneList[nextIndex].y }, () => {
-              zoneList[nextIndex].setData("data", card);
-              zoneList[nextIndex].setData("isOccupied", true);
-            });
-          }
-          this.assignToZone(gameObject, dropZone);
-          this.resetZone();
+        if (direction === 'right') {
+          shiftRightDirection(this, zoneList, targetIndex, occupiedZones, dropZone, gameObject);
+        } else if (direction === 'left') {
+          shiftLeftDirection(this, zoneList, targetIndex, occupiedZones, dropZone, gameObject);
         }
       }
       else {

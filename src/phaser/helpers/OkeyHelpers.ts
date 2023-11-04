@@ -1,6 +1,6 @@
 import { vector2 } from "../types";
 import { tweenPosition } from "./TweensHelpers";
-import {GameObjects} from 'phaser';
+import { GameObjects, Scene } from 'phaser';
 
 export function parseZoneName(data: string) {
     const label = data.split("_")[0];
@@ -46,6 +46,39 @@ export function getAdjacentOccupiedZones(zones:GameObjects.Zone[], targetZone:Ga
 
     return { occupiedZones, direction }; // Return the entire list if all zones are occupied
 }
+
+export function shiftRightDirection(scene, zoneList: GameObjects.Zone[], targetIndex: number, occupiedZones: GameObjects.Zone[], dropZone, gameObject) {
+    for (let i = targetIndex; i < targetIndex + occupiedZones.length; i++) {
+        const card = zoneList[i].getData('data');
+        const nextIndex = i + 1;
+
+        const pos: vector2 = { x: zoneList[nextIndex].x, y: zoneList[nextIndex].y };
+        tweenCardToPos(scene, card, pos, () => {
+            zoneList[nextIndex].setData('data', card);
+            zoneList[nextIndex].setData('isOccupied', true);
+        });
+    }
+
+    scene.assignToZone(gameObject, dropZone);
+    scene.resetZone();
+}
+
+export function shiftLeftDirection(scene, zoneList: GameObjects.Zone[], targetIndex: number, occupiedZones: GameObjects.Zone[], dropZone, gameObject) {
+    for (let i = targetIndex; i > targetIndex - occupiedZones.length; i--) {
+        const card = zoneList[i].getData('data');
+        const nextIndex = i - 1;
+
+        const pos: vector2 = { x: zoneList[nextIndex].x, y: zoneList[nextIndex].y };
+        tweenCardToPos(scene, card, pos, () => {
+            zoneList[nextIndex].setData('data', card);
+            zoneList[nextIndex].setData('isOccupied', true);
+        });
+    }
+
+    scene.assignToZone(gameObject, dropZone);
+    scene.resetZone();
+}
+  
 
 export function tweenCardToPos(context: Phaser.Scene, card: GameObjects.Image, pos: vector2, completeCallback?:any) {
     const tweenConfig = { scale: { from: 1.5, to: 1 } };
