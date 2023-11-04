@@ -2,7 +2,7 @@
 /* eslint-disable prefer-const */
 import Phaser from 'phaser';
 import _ from 'lodash';
-import { PhaserHelpers, createDropZone, determineZoneType, getShiftableZones, okeyDealingTween, tweenPosition, } from '../helpers';
+import { PhaserHelpers, createDropZone, determineZoneType, getAdjacentOccupiedZones, okeyDealingTween, tweenPosition, } from '../helpers';
 import { ShapeSettings } from '../settings/ShapeSettings';
 import { TextSettings } from '../settings/TextSettings';
 
@@ -211,6 +211,7 @@ export class OkeyScene extends Phaser.Scene {
     // console.log(`before >> target: ${dropZone?.getData('isOccupied')} | last: ${this.lastDropZone?.getData('isOccupied')}`);
 
     if (dropZone) {
+      //? handle un-occupied zone
       if (!dropZone.getData('isOccupied')) {
         // empty zone
         gameObject.setPosition(dropZone.x, dropZone.y);
@@ -223,27 +224,23 @@ export class OkeyScene extends Phaser.Scene {
           this.lastDropZone = null;
         }
       } else {
-        // occupied zone
+        //? handle occupied zone
         const zoneList = determineZoneType(dropZone.name) === "top" ? this.zoneTop : this.zoneBottom;
-        // check if there any empty adjacent zone
-        const result = getShiftableZones(zoneList, dropZone);
+        const result = getAdjacentOccupiedZones(zoneList, dropZone);
         console.log(result);
         const direction = result.direction;
-        const shiftableZones = result.shiftableZones;
+        const occupiedZones = result.occupiedZones;
 
-        if (shiftableZones.length > 0) {
-          // shiftableZones.unshift(dropZone);
-          // const cardObjects = result.map(zone => zone.getData('data'));
-
+        if (direction != null) {
           const targetIndex = zoneList.findIndex((zone) => zone.name === dropZone.name);
 
-          for (let i = targetIndex; i < targetIndex + shiftableZones.length; i++) {
-            console.log('index >> ', i, ' <next indxe >', i+1);
+          for (let i = targetIndex; i < targetIndex + occupiedZones.length; i++) {
+            console.log('index >> ', i, ' < next index >', i+1);
             const card = zoneList[i].getData('data');
             const nextIndex = i + 1;
 
-            // const tweenConfig = {angle: { from: 0, to: 25 }};
-            tweenPosition(this, card, { x: zoneList[nextIndex].x, y: zoneList[nextIndex].y }, null, ()=>{
+            const tweenConfig = { scale: {from : 1.5, to:1} };
+            tweenPosition(this, card, { x: zoneList[nextIndex].x, y: zoneList[nextIndex].y }, tweenConfig, () => {
               zoneList[nextIndex].setData('data', card);
               zoneList[nextIndex].setData('isOccupied', true);
             });
@@ -253,16 +250,21 @@ export class OkeyScene extends Phaser.Scene {
           dropZone.setData('isOccupied', true);
           dropZone.setData('data', gameObject);
 
-          console.log(`targetIndex ${targetIndex} result ${shiftableZones.length}`);
+          console.log(`targetIndex ${targetIndex} result ${occupiedZones.length}`);
+          return;
         }
-        this.resetZone();
+        this.handleInvalidZone(gameObject);
       }
     } else {
       // invalid zone
-      tweenPosition(this, gameObject, { x: gameObject.input.dragStartX, y: gameObject.input.dragStartY });
-      this.resetZone();
+      this.handleInvalidZone(gameObject);
     }
     // console.log(`after >> target: ${dropZone?.getData('isOccupied')} | last: ${this.lastDropZone?.getData('isOccupied')}`);
+  }
+
+  handleInvalidZone(gameObject){
+    tweenPosition(this, gameObject, { x: gameObject.input.dragStartX, y: gameObject.input.dragStartY });
+    this.resetZone();
   }
 
   resetZone(){
