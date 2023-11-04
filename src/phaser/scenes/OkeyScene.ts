@@ -2,7 +2,7 @@
 /* eslint-disable prefer-const */
 import Phaser from 'phaser';
 import _ from 'lodash';
-import { PhaserHelpers, createDropZone, determineZoneType, getAdjacentOccupiedZones, okeyDealingTween, tweenPosition, } from '../helpers';
+import { PhaserHelpers, createDropZone, determineZoneType, getAdjacentOccupiedZones, okeyDealingTween, tweenCardToPos, tweenPosition, } from '../helpers';
 import { ShapeSettings } from '../settings/ShapeSettings';
 import { TextSettings } from '../settings/TextSettings';
 
@@ -245,28 +245,36 @@ export class OkeyScene extends Phaser.Scene {
       console.log({ occupiedZones, direction });
 
       if (occupiedZones.length > 1) {
+        const targetIndex = zoneList.findIndex((zone) => zone.name === dropZone.name);
         if (direction === "right") {
-          const targetIndex = zoneList.findIndex((zone) => zone.name === dropZone.name);
-          
           for (let i = targetIndex; i < targetIndex + occupiedZones.length; i++) {
-            const card = zoneList[i].getData('data');
+            const card = zoneList[i].getData("data");
             const nextIndex = i + 1;
-            card.setPosition(zoneList[nextIndex].x, zoneList[nextIndex].y);
-            zoneList[nextIndex].setData('data', card);
-            zoneList[nextIndex].setData('isOccupied', true);
-            console.log(`index ${i} next ${nextIndex}`);
-            // const tweenConfig = { scale: { from: 1.5, to: 1 } };
-            //   tweenPosition(this, card, { x: zoneList[nextIndex].x, y: zoneList[nextIndex].y }, tweenConfig, () => {
-            //     zoneList[nextIndex].setData('data', card);
-            //     zoneList[nextIndex].setData('isOccupied', true);
-            //   });
+
+            tweenCardToPos(this, card, { x: zoneList[nextIndex].x, y: zoneList[nextIndex].y }, () => {
+              zoneList[nextIndex].setData("data", card);
+              zoneList[nextIndex].setData("isOccupied", true);
+            });
+          }
+          this.assignToZone(gameObject, dropZone);
+          this.resetZone();
+        } else if (direction === "left") {
+          for (let i = targetIndex; i > targetIndex - occupiedZones.length; i--) {
+            const card = zoneList[i].getData("data");
+            const nextIndex = i - 1;
+
+            tweenCardToPos(this, card, { x: zoneList[nextIndex].x, y: zoneList[nextIndex].y }, () => {
+              zoneList[nextIndex].setData("data", card);
+              zoneList[nextIndex].setData("isOccupied", true);
+            });
           }
           this.assignToZone(gameObject, dropZone);
           this.resetZone();
         }
       }
-
-      // this.handleInvalidZone(gameObject);
+      else {
+        this.handleInvalidZone(gameObject);
+      }
     }
   }
 

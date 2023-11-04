@@ -1,4 +1,6 @@
+import { vector2 } from "../types";
 import { tweenPosition } from "./TweensHelpers";
+import {GameObjects} from 'phaser';
 
 export function parseZoneName(data: string) {
     const label = data.split("_")[0];
@@ -14,7 +16,7 @@ export function determineZoneType(zoneName: string) {
     }
 }
 
-export function getAdjacentOccupiedZones(zones:Phaser.GameObjects.Zone[], targetZone:Phaser.GameObjects.Zone): any {
+export function getAdjacentOccupiedZones(zones:GameObjects.Zone[], targetZone:GameObjects.Zone): any {
     const targetIndex = zones.findIndex((zone) => zone.name === targetZone.name);
     let occupiedZones = [];
     let direction = null;
@@ -43,5 +45,12 @@ export function getAdjacentOccupiedZones(zones:Phaser.GameObjects.Zone[], target
     }
 
     return { occupiedZones, direction }; // Return the entire list if all zones are occupied
+}
+
+export function tweenCardToPos(context: Phaser.Scene, card: GameObjects.Image, pos: vector2, completeCallback?:any) {
+    const tweenConfig = { scale: { from: 1.5, to: 1 } };
+    tweenPosition(context, card, { x: pos.x, y: pos.y }, tweenConfig, () => {
+        completeCallback?.();
+    });
 }
 
