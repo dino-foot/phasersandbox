@@ -118,21 +118,6 @@ export class OkeyScene extends Phaser.Scene {
     }
   }
 
-  // Phaser.GameObjects.Group.shiftPosition(x, y, direction):
-  // Phaser.Actions.ShiftPosition(items, x, y, direction, output):
-//   const group = this.add.group({
-//     key: 'diamonds',
-//     frame: [ 0, 1, 2, 3, 4 ],
-//     setXY:
-//     {
-//         x: 100,
-//         y: 100,
-//         stepX: 64
-//     }
-// });
-  // width = 52px
-  // height = 76px
-  // platform width = 52x12 = 624 (max=12 stone)
   createDeck() {
     this.deck = [];
     const offset = 0.25;
@@ -168,11 +153,12 @@ export class OkeyScene extends Phaser.Scene {
         this.targetDropZone = dropZone;
         if (this.lastDropZone === null) {
           this.lastDropZone = this.targetDropZone;
-          // console.log('last ', this.lastDropZone?.name);
         }
-        // console.log('dragenter ', this.lastDropZone?.name, dropZone.name);
-        // console.log('dragenter ', dropZone.name);
         // console.log(`dragenter >> target: ${this.targetDropZone?.getData('isOccupied')} | last: ${this.lastDropZone?.getData('isOccupied')}`);
+      });
+
+      this.input.on('dragleave', (pointer, gameObject, dropZone) => {
+        this.resetZone();
       });
 
 
@@ -208,7 +194,7 @@ export class OkeyScene extends Phaser.Scene {
   } // end
 
   handleDropEvent(pointer, gameObject, dropZone) {
-    console.log(`before >> target: ${this.targetDropZone.name} | last: ${this.lastDropZone.name}`);
+    console.log(`before >> target: ${this.targetDropZone?.name} | last: ${this.lastDropZone?.name}`);
 
     if (dropZone) {
       //? handle un-occupied zone
