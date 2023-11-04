@@ -208,15 +208,13 @@ export class OkeyScene extends Phaser.Scene {
   } // end
 
   handleDropEvent(pointer, gameObject, dropZone) {
-    // console.log(`before >> target: ${dropZone?.getData('isOccupied')} | last: ${this.lastDropZone?.getData('isOccupied')}`);
+    console.log(`before >> target: ${this.targetDropZone.name} | last: ${this.lastDropZone.name}`);
 
     if (dropZone) {
       //? handle un-occupied zone
-      if (!dropZone.getData('isOccupied')) {
+      if (dropZone.getData('isOccupied') === false) {
         // empty zone
-        gameObject.setPosition(dropZone.x, dropZone.y);
-        dropZone.setData('isOccupied', true);
-        dropZone.setData('data', gameObject);
+        this.assignToZone(gameObject, dropZone);
 
         if (this.lastDropZone && this.lastDropZone !== this.targetDropZone) {
           this.lastDropZone.setData('isOccupied', false);
@@ -224,6 +222,13 @@ export class OkeyScene extends Phaser.Scene {
           this.lastDropZone = null;
         }
       } else {
+
+        if (this.targetDropZone === this.lastDropZone) {
+          this.handleInvalidZone(gameObject);
+          this.resetZone();
+          return;
+        }
+
         //? handle occupied zone
         const zoneList = determineZoneType(dropZone.name) === "top" ? this.zoneTop : this.zoneBottom;
         const result = getAdjacentOccupiedZones(zoneList, dropZone);
@@ -235,20 +240,18 @@ export class OkeyScene extends Phaser.Scene {
           const targetIndex = zoneList.findIndex((zone) => zone.name === dropZone.name);
 
           for (let i = targetIndex; i < targetIndex + occupiedZones.length; i++) {
-            console.log('index >> ', i, ' < next index >', i+1);
+            console.log('index >> ', i, ' < next index >', i + 1);
             const card = zoneList[i].getData('data');
             const nextIndex = i + 1;
 
-            const tweenConfig = { scale: {from : 1.5, to:1} };
+            const tweenConfig = { scale: { from: 1.5, to: 1 } };
             tweenPosition(this, card, { x: zoneList[nextIndex].x, y: zoneList[nextIndex].y }, tweenConfig, () => {
               zoneList[nextIndex].setData('data', card);
               zoneList[nextIndex].setData('isOccupied', true);
             });
           }
 
-          gameObject.setPosition(dropZone.x, dropZone.y);
-          dropZone.setData('isOccupied', true);
-          dropZone.setData('data', gameObject);
+          this.assignToZone(gameObject, dropZone);
 
           console.log(`targetIndex ${targetIndex} result ${occupiedZones.length}`);
           return;
@@ -256,7 +259,7 @@ export class OkeyScene extends Phaser.Scene {
         this.handleInvalidZone(gameObject);
       }
     } else {
-      // invalid zone
+      //? invalid zone
       this.handleInvalidZone(gameObject);
     }
     // console.log(`after >> target: ${dropZone?.getData('isOccupied')} | last: ${this.lastDropZone?.getData('isOccupied')}`);
@@ -266,6 +269,13 @@ export class OkeyScene extends Phaser.Scene {
     tweenPosition(this, gameObject, { x: gameObject.input.dragStartX, y: gameObject.input.dragStartY });
     this.resetZone();
   }
+
+  assignToZone(gameObject, targetZone) {
+    gameObject.setPosition(targetZone.x, targetZone.y);
+    targetZone.setData('isOccupied', true);
+    targetZone.setData('data', gameObject);
+  }
+
 
   resetZone(){
     this.lastDropZone = null;
