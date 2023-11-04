@@ -236,16 +236,37 @@ export class OkeyScene extends Phaser.Scene {
       this.assignToZone(gameObject, dropZone);
 
       if (this.lastDropZone && this.lastDropZone !== this.targetDropZone) {
-        this.lastDropZone.setData("isOccupied", false);
-        this.lastDropZone.setData("data", null);
-        this.lastDropZone = null;
+        this.resetZone();
       }
     } else {
       //? handle occupied zone
       const zoneList = determineZoneType(dropZone.name) === "top" ? this.zoneTop : this.zoneBottom;
       const { occupiedZones, direction } = getAdjacentOccupiedZones(zoneList, dropZone);
       console.log({ occupiedZones, direction });
-      this.handleInvalidZone(gameObject);
+
+      if (occupiedZones.length > 1) {
+        if (direction === "right") {
+          const targetIndex = zoneList.findIndex((zone) => zone.name === dropZone.name);
+          
+          for (let i = targetIndex; i < targetIndex + occupiedZones.length; i++) {
+            const card = zoneList[i].getData('data');
+            const nextIndex = i + 1;
+            card.setPosition(zoneList[nextIndex].x, zoneList[nextIndex].y);
+            zoneList[nextIndex].setData('data', card);
+            zoneList[nextIndex].setData('isOccupied', true);
+            console.log(`index ${i} next ${nextIndex}`);
+            // const tweenConfig = { scale: { from: 1.5, to: 1 } };
+            //   tweenPosition(this, card, { x: zoneList[nextIndex].x, y: zoneList[nextIndex].y }, tweenConfig, () => {
+            //     zoneList[nextIndex].setData('data', card);
+            //     zoneList[nextIndex].setData('isOccupied', true);
+            //   });
+          }
+          this.assignToZone(gameObject, dropZone);
+          this.resetZone();
+        }
+      }
+
+      // this.handleInvalidZone(gameObject);
     }
   }
 
@@ -261,7 +282,10 @@ export class OkeyScene extends Phaser.Scene {
   }
 
   resetZone() {
+    this.lastDropZone?.setData("isOccupied", false);
+    this.lastDropZone?.setData("data", null);
     this.lastDropZone = null;
+
     this.targetDropZone = null;
   }
 } // end class
