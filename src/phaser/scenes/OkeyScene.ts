@@ -154,11 +154,11 @@ export class OkeyScene extends Phaser.Scene {
         if (this.lastDropZone === null) {
           this.lastDropZone = this.targetDropZone;
         }
-        // console.log(`dragenter >> target: ${this.targetDropZone?.getData('isOccupied')} | last: ${this.lastDropZone?.getData('isOccupied')}`);
+        console.log(`dragenter >> target: ${this.targetDropZone?.name} | last: ${this.lastDropZone?.name}`);
       });
 
       this.input.on('dragleave', (pointer, gameObject, dropZone) => {
-        this.resetZone();
+        this.targetDropZone = null;
       });
 
 
@@ -194,7 +194,7 @@ export class OkeyScene extends Phaser.Scene {
   } // end
 
   handleDropEvent(pointer, gameObject, dropZone) {
-    console.log(`before >> target: ${this.targetDropZone?.name} | last: ${this.lastDropZone?.name}`);
+    console.log(`pointerup >> target: ${this.targetDropZone?.name} | last: ${this.lastDropZone?.name}`);
 
     if (dropZone) {
       //? handle un-occupied zone
