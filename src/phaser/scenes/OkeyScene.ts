@@ -112,7 +112,6 @@ export class OkeyScene extends Phaser.Scene {
         console.log('deal stone');
         break;
       case 'RESET':
-        case 'RESET':
         this.scene.restart();
         break;        
     }
@@ -154,7 +153,7 @@ export class OkeyScene extends Phaser.Scene {
         if (this.lastDropZone === null) {
           this.lastDropZone = this.targetDropZone;
         }
-        console.log(`dragenter >> target: ${this.targetDropZone?.name} | last: ${this.lastDropZone?.name}`);
+        // console.log(`dragenter >> target: ${this.targetDropZone?.name} | last: ${this.lastDropZone?.name}`);
       });
 
       this.input.on('dragleave', (pointer, gameObject, dropZone) => {
@@ -194,7 +193,7 @@ export class OkeyScene extends Phaser.Scene {
   } // end
 
   handleDropEvent(pointer, gameObject, dropZone) {
-    console.log(`pointerup >> target: ${this.targetDropZone?.name} | last: ${this.lastDropZone?.name}`);
+    // console.log(`pointerup >> target: ${this.targetDropZone?.name} | last: ${this.lastDropZone?.name}`);
 
     if (dropZone) {
       //? handle un-occupied zone
@@ -217,29 +216,48 @@ export class OkeyScene extends Phaser.Scene {
 
         //? handle occupied zone
         const zoneList = determineZoneType(dropZone.name) === "top" ? this.zoneTop : this.zoneBottom;
-        const result = getAdjacentOccupiedZones(zoneList, dropZone);
-        console.log(result);
-        const direction = result.direction;
-        const occupiedZones = result.occupiedZones;
+        const {occupiedZones, direction} = getAdjacentOccupiedZones(zoneList, dropZone);
+        console.log({occupiedZones, direction});
+        
+        // const direction = result.direction;
+        // const occupiedZones = result.occupiedZones;
 
         if (direction != null) {
           const targetIndex = zoneList.findIndex((zone) => zone.name === dropZone.name);
 
-          for (let i = targetIndex; i < targetIndex + occupiedZones.length; i++) {
-            console.log('index >> ', i, ' < next index >', i + 1);
-            const card = zoneList[i].getData('data');
-            const nextIndex = i + 1;
+          if (direction === "right") {
+            
+            for (let i = targetIndex; i < targetIndex + occupiedZones.length; i++) {
+              const card = zoneList[i].getData('data');
+              console.log(`targetIndex ${i - 1} card ${card.name}`);
+              if (card === undefined) break;
+              const nextIndex = i + 1;
 
-            const tweenConfig = { scale: { from: 1.5, to: 1 } };
-            tweenPosition(this, card, { x: zoneList[nextIndex].x, y: zoneList[nextIndex].y }, tweenConfig, () => {
-              zoneList[nextIndex].setData('data', card);
-              zoneList[nextIndex].setData('isOccupied', true);
-            });
+              const tweenConfig = { scale: { from: 1.5, to: 1 } };
+              tweenPosition(this, card, { x: zoneList[nextIndex].x, y: zoneList[nextIndex].y }, tweenConfig, () => {
+                zoneList[nextIndex].setData('data', card);
+                zoneList[nextIndex].setData('isOccupied', true);
+              });
+            }
+
+          } else if (direction === "left") {
+            for (let i = targetIndex; i > targetIndex - occupiedZones.length; i--) {
+              const card = zoneList[i].getData('data');
+              console.log(`targetIndex ${i - 1} card ${card.name}`);
+
+              if (card === undefined) break;
+              const nextIndex = i - 1;
+
+              const tweenConfig = { scale: { from: 1.5, to: 1 } };
+              tweenPosition(this, card, { x: zoneList[nextIndex].x, y: zoneList[nextIndex].y }, tweenConfig, () => {
+                zoneList[nextIndex].setData('data', card);
+                zoneList[nextIndex].setData('isOccupied', true);
+              });
+            }
           }
 
-          this.assignToZone(gameObject, dropZone);
-
-          console.log(`targetIndex ${targetIndex} result ${occupiedZones.length}`);
+          this.assignToZone(gameObject, zoneList[targetIndex]);
+          // console.log(`targetIndex ${targetIndex} result ${occupiedZones.length}`);
           return;
         }
         this.handleInvalidZone(gameObject);
