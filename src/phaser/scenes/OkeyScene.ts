@@ -2,7 +2,7 @@
 /* eslint-disable prefer-const */
 import Phaser from 'phaser';
 import _ from 'lodash';
-import { PhaserHelpers, createDropZone, determineZoneType, getAdjacentOccupiedZones, okeyDealingTween, shiftLeftDirection, shiftRightDirection, tweenPosition, } from '../helpers';
+import { PhaserHelpers, createDropZone, determineZoneType, enableZoneDebugInput, getAdjacentOccupiedZones, okeyDealingTween, shiftLeftDirection, shiftRightDirection, tweenPosition, } from '../helpers';
 import { ShapeSettings } from '../settings/ShapeSettings';
 import { TextSettings } from '../settings/TextSettings';
 
@@ -10,10 +10,6 @@ export class OkeyScene extends Phaser.Scene {
   deck: Phaser.GameObjects.GameObject[] = [];
   centerX: number;
   centerY: number;
-  topStartX: number;
-  topStartY: number;
-  bottomStartX: number;
-  bottomStartY: number;
   topPlatform: Phaser.GameObjects.Rectangle;
   bottomPlatform: Phaser.GameObjects.Rectangle;
   okeyLabel = ["black", "blue", "red", "yellow"];
@@ -52,45 +48,30 @@ export class OkeyScene extends Phaser.Scene {
     this.bottomPlatform.setPosition(this.centerX, this.game.canvas.height - 350);
 
     // create drop zone for cards
-    this.topStartX = this.topPlatform.x + this.cardWidth / 2 - this.topPlatform.width / 2;
-    this.topStartY = this.topPlatform.y + this.cardHeight / 2 - this.topPlatform.height / 2;
+    const topStartX = this.topPlatform.x + this.cardWidth / 2 - this.topPlatform.width / 2;
+    const topStartY = this.topPlatform.y + this.cardHeight / 2 - this.topPlatform.height / 2;
 
-    this.bottomStartX = this.bottomPlatform.x + this.cardWidth / 2 - this.bottomPlatform.width / 2;
-    this.bottomStartY = this.bottomPlatform.y + this.cardHeight / 2 - this.bottomPlatform.height / 2;
+    const bottomStartX = this.bottomPlatform.x + this.cardWidth / 2 - this.bottomPlatform.width / 2;
+    const bottomStartY = this.bottomPlatform.y + this.cardHeight / 2 - this.bottomPlatform.height / 2;
 
     for (let i = 0; i < Math.round(this.topPlatform.width / this.cardWidth); i++) {
-      const zone = createDropZone(this, { x: this.topStartX + i * this.cardWidth, y: this.topStartY }, true);
+      const zone = createDropZone(this, { x: topStartX + i * this.cardWidth, y: topStartY }, true);
       zone.setName(`zone_top_${i}`);
       zone.setData("isOccupied", false);
       this.zoneTop.push(zone);
       this.zoneList.push(zone);
-
-      zone.setInteractive(true);
-      zone.on(
-        "pointerdown",
-        () => {
-          console.log(` name : ${zone.name} | occupied ${zone.getData("isOccupied")} | card ${zone.getData("data")?.name}`);
-        },
-        this
-      );
+      // debug
+      // enableZoneDebugInput(this, zone);
     }
 
     for (let i = 0; i < Math.round(this.bottomPlatform.width / this.cardWidth); i++) {
-      const zone = createDropZone(this, { x: this.bottomStartX + i * this.cardWidth, y: this.bottomStartY }, true);
+      const zone = createDropZone(this, { x: bottomStartX + i * this.cardWidth, y: bottomStartY }, true);
       zone.setName(`zone_bottom_${i}`);
       zone.setData("isOccupied", false);
       this.zoneBottom.push(zone);
       this.zoneList.push(zone);
-
       // debug
-      zone.setInteractive(true);
-      zone.on(
-        "pointerdown",
-        () => {
-          console.log(` name : ${zone.name} | occupied ${zone.getData("isOccupied")} | card ${zone.getData("data")?.name}`);
-        },
-        this
-      );
+      // enableZoneDebugInput(this, zone);
     }
 
     this.createDeck();
@@ -98,11 +79,10 @@ export class OkeyScene extends Phaser.Scene {
 
   // todo
   // stone dealing (done)
-  //? stones grouping (wip)
+  // stones grouping (done)
   // implement desktop drag and drop individual stone (done)
-  // implement desktop drag and drop grouped stones.  The "group move" button appears when you hover on a group.
+  //? implement desktop drag and drop grouped stones.  The "group move" button appears when you hover on a group. (wip)
   // implement mobile drag and drop individual stone
-  // add different cursor
 
   //? fix scopa scaling
 
@@ -161,7 +141,7 @@ export class OkeyScene extends Phaser.Scene {
       const card = this.add.image(posX, posY, "okey-stones", i);
       card.depth = 10;
       card.setName(`${this.okeyLabel[labelIndex]}_${stoneNumber}`);
-      card.setInteractive({ draggable: true, useHandCursor: true });
+      card.setInteractive({ draggable: true, useHandCursor: true,  });
       this.deck.push(card);
 
       //? ----- object events ------

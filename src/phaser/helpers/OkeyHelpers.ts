@@ -80,10 +80,21 @@ export function shiftLeftDirection(scene, zoneList: GameObjects.Zone[], targetIn
 }
   
 
-export function tweenCardToPos(context: Phaser.Scene, card: GameObjects.Image, pos: vector2, completeCallback?:any) {
+export function tweenCardToPos(context: Scene, card: GameObjects.Image, pos: vector2, completeCallback?:any) {
     const tweenConfig = { scale: { from: 1.5, to: 1 } };
     tweenPosition(context, card, { x: pos.x, y: pos.y }, tweenConfig, () => {
         completeCallback?.();
     });
+}
+
+export function enableZoneDebugInput(context: Scene, zone: Phaser.GameObjects.Zone) {
+    zone.setInteractive(true);
+    zone.on(
+      "pointerdown",
+      () => {
+        console.log(` name : ${zone.name} | occupied ${zone.getData("isOccupied")} | card ${zone.getData("data")?.name}`);
+      },
+      this
+    );
 }
 
