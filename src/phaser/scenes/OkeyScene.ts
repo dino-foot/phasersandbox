@@ -29,6 +29,7 @@ export class OkeyScene extends Phaser.Scene {
 
   init() {
     console.log("okey-init");
+    
     this.targetDropZone = null;
     this.lastDropZone = null;
     this.zoneList = [];
@@ -48,6 +49,11 @@ export class OkeyScene extends Phaser.Scene {
     this.topPlatform.setPosition(this.centerX, this.game.canvas.height - 500);
     this.bottomPlatform.setPosition(this.centerX, this.game.canvas.height - 350);
 
+    if (this.sys.game.device.os.android || this.sys.game.device.os.iOS) {
+      this.topPlatform.y -= 200;
+      this.bottomPlatform.y -= 200;
+    }
+    
     // create drop zone for cards
     const topStartX = this.topPlatform.x + this.cardWidth / 2 - this.topPlatform.width / 2;
     const topStartY = this.topPlatform.y + this.cardHeight / 2 - this.topPlatform.height / 2;
@@ -83,7 +89,7 @@ export class OkeyScene extends Phaser.Scene {
   // stones grouping (done)
   // implement desktop drag and drop individual stone (done)
   //? implement desktop drag and drop grouped stones.  The "group move" button appears when you hover on a group. (wip)
-  // implement mobile drag and drop individual stone
+  // implement mobile drag and drop individual stone (done)
 
   //? fix scopa scaling
 
