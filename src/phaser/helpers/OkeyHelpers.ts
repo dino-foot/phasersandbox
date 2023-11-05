@@ -28,7 +28,8 @@ export function getAdjacentOccupiedZones(zones:GameObjects.Zone[], targetZone:Ga
                 direction = 'right';
                 return { occupiedZones, direction };
             }
-            occupiedZones.push(i);
+            // occupiedZones.push(i);
+            occupiedZones.push(zones[i]);
         }
 
         // Check left adjacent zones if no unoccupied zone is found on the right
@@ -39,7 +40,8 @@ export function getAdjacentOccupiedZones(zones:GameObjects.Zone[], targetZone:Ga
                     direction = 'left';
                     return { occupiedZones, direction }; // Stop checking left adjacent zones if an unoccupied zone is found
                 }
-                occupiedZones.push(i);
+                // occupiedZones.push(i);
+                occupiedZones.push(zones[i]);
             }
         }
     }

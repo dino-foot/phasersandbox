@@ -1,27 +1,29 @@
 /* eslint-disable max-len */
 /* eslint-disable prefer-const */
 import Phaser from 'phaser';
+import { GameObjects } from 'phaser';
 import _ from 'lodash';
 import { PhaserHelpers, createDropZone, determineZoneType, enableZoneDebugInput, getAdjacentOccupiedZones, okeyDealingTween, shiftLeftDirection, shiftRightDirection, tweenPosition, } from '../helpers';
 import { ShapeSettings } from '../settings/ShapeSettings';
 import { TextSettings } from '../settings/TextSettings';
 
 export class OkeyScene extends Phaser.Scene {
-  deck: Phaser.GameObjects.GameObject[] = [];
+  deck: GameObjects.GameObject[] = [];
   centerX: number;
   centerY: number;
-  topPlatform: Phaser.GameObjects.Rectangle;
-  bottomPlatform: Phaser.GameObjects.Rectangle;
+  topPlatform: GameObjects.Rectangle;
+  bottomPlatform: GameObjects.Rectangle;
   okeyLabel = ["black", "blue", "red", "yellow"];
-  dealStone: Phaser.GameObjects.Text;
-  targetDropZone: Phaser.GameObjects.Zone;
-  lastDropZone: Phaser.GameObjects.Zone;
-  zoneList: Phaser.GameObjects.Zone[];
-  zoneTop: Phaser.GameObjects.Zone[];
-  zoneBottom: Phaser.GameObjects.Zone[];
+  dealStone: GameObjects.Text;
+  targetDropZone: GameObjects.Zone;
+  lastDropZone: GameObjects.Zone;
+  zoneList: GameObjects.Zone[];
+  zoneTop: GameObjects.Zone[];
+  zoneBottom: GameObjects.Zone[];
+  tiltedZones: GameObjects.Zone[];
   cardWidth = 52;
   cardHeight = 76;
-  resetButton: Phaser.GameObjects.Text;
+  resetButton: GameObjects.Text;
   constructor() {
     super("okey");
   }
@@ -90,20 +92,8 @@ export class OkeyScene extends Phaser.Scene {
     this.dealStone = PhaserHelpers.addText(TextSettings.DEAL_CARDS, this);
     this.resetButton = PhaserHelpers.addText(TextSettings.RESET, this);
 
-    this.dealStone.on(
-      "pointerdown",
-      () => {
-        this.handleUIEvents("DEAL STONE");
-      },
-      this
-    );
-    this.resetButton.on(
-      "pointerdown",
-      () => {
-        this.handleUIEvents("RESET");
-      },
-      this
-    );
+    this.dealStone.on("pointerdown", () => { this.handleUIEvents("DEAL STONE"); }, this);
+    this.resetButton.on("pointerdown", () => { this.handleUIEvents("RESET"); }, this);
   }
 
   handleUIEvents(type: "RESET" | "DEAL STONE") {
@@ -163,11 +153,28 @@ export class OkeyScene extends Phaser.Scene {
         if (this.lastDropZone === null) {
           this.lastDropZone = this.targetDropZone;
         }
-        // console.log(`dragenter >> target: ${this.targetDropZone?.name} | last: ${this.lastDropZone?.name}`);
+
+        // const zoneList = determineZoneType(dropZone.name) === "top" ? this.zoneTop : this.zoneBottom;
+        // const { occupiedZones, direction } = getAdjacentOccupiedZones(zoneList, dropZone);
+
+        // if (direction !== null && occupiedZones.length > 1) {
+        //   this.tiltedZones = occupiedZones;
+        //   occupiedZones.forEach(zone => {
+        //     const dir = direction === 'left' ? -1 : 1;
+        //     const card = zone.getData('data');
+        //     card?.setAngle(dir * 15);
+        //   });
+        // }
+        // console.log(`dragenter >> target: ${occupiedZones.length} | last: ${this.lastDropZone?.name}`);
       });
 
       this.input.on("dragleave", (pointer, gameObject, dropZone) => {
         this.targetDropZone = null;
+        // reset angle
+        // this.tiltedZones.forEach(zone => {
+        //   const card = zone.getData('data');
+        //   card?.setAngle(0);
+        // });
       });
 
       card.on("pointerup", (pointer, localX, localY) => {
@@ -229,8 +236,9 @@ export class OkeyScene extends Phaser.Scene {
         return;
       }
       // console.log({ occupiedZones, direction });
+      // console.log(`target ${this.targetDropZone.name} last ${this.lastDropZone.name} card ${gameObject.name}`);
 
-      if (occupiedZones.length > 1) {
+      if (occupiedZones.length > 1 && this.targetDropZone !== this.lastDropZone) {
         const targetIndex = zoneList.findIndex((zone) => zone.name === dropZone.name);
         if (direction === 'right') {
           shiftRightDirection(this, zoneList, targetIndex, occupiedZones, dropZone, gameObject);
