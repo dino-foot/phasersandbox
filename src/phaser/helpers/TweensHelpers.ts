@@ -145,7 +145,7 @@ export const tweenBounceScaleUp = (context: Phaser.Scene, targets: Phaser.GameOb
 export const okeyDealingTween = (context: Phaser.Scene, cardList: Phaser.GameObjects.Image[], zoneList: Phaser.GameObjects.Zone[]) => {
   cardList.forEach((card, index) => {
     const zone = zoneList[index];
-    const { x, y } = zone;
+    const { x, y } = zone; // get zone position 
     if (zone.getData('isOccupied') === false) {
       tweenPosition(context, card, { x, y }, {angle: { from: 180, to: 0 }, delay: index * 100, duration: 600});
       // console.log('true ');
@@ -156,15 +156,19 @@ export const okeyDealingTween = (context: Phaser.Scene, cardList: Phaser.GameObj
 };
 
 
-export const tweenPosition = (context: Phaser.Scene, target: Phaser.GameObjects.GameObject, pos: vector2, data?: any) => {
+export const tweenPosition = (context: Phaser.Scene, target: Phaser.GameObjects.GameObject, pos: vector2, data?: any, completeCallback?: any) => {
   context.tweens.add({
     targets: target,
     x: pos.x,
     y: pos.y,
-    delay: data != null ? data?.delay : 0,
-    duration: data != null ? data?.duration : 200,
-    angle: data != null ? data?.angle : 0,
+    delay: data?.delay != null ? data.delay : 0,
+    duration: data?.duration != null ? data.duration : 200,
+    angle: data?.angle != null ? data.angle : 0,
+    scale: data?.scale != null ? data.scale: 1,
     ease: Phaser.Math.Easing.Sine.Out,
+    onComplete: () => {
+      completeCallback?.();
+    }
   });
 };
 
