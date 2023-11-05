@@ -20,7 +20,6 @@ export class OkeyScene extends Phaser.Scene {
   zoneList: GameObjects.Zone[];
   zoneTop: GameObjects.Zone[];
   zoneBottom: GameObjects.Zone[];
-  tiltedZones: GameObjects.Zone[];
   cardWidth = 52;
   cardHeight = 76;
   resetButton: GameObjects.Text;
@@ -153,28 +152,11 @@ export class OkeyScene extends Phaser.Scene {
         if (this.lastDropZone === null) {
           this.lastDropZone = this.targetDropZone;
         }
-
-        // const zoneList = determineZoneType(dropZone.name) === "top" ? this.zoneTop : this.zoneBottom;
-        // const { occupiedZones, direction } = getAdjacentOccupiedZones(zoneList, dropZone);
-
-        // if (direction !== null && occupiedZones.length > 1) {
-        //   this.tiltedZones = occupiedZones;
-        //   occupiedZones.forEach(zone => {
-        //     const dir = direction === 'left' ? -1 : 1;
-        //     const card = zone.getData('data');
-        //     card?.setAngle(dir * 15);
-        //   });
-        // }
         // console.log(`dragenter >> target: ${occupiedZones.length} | last: ${this.lastDropZone?.name}`);
       });
 
       this.input.on("dragleave", (pointer, gameObject, dropZone) => {
         this.targetDropZone = null;
-        // reset angle
-        // this.tiltedZones.forEach(zone => {
-        //   const card = zone.getData('data');
-        //   card?.setAngle(0);
-        // });
       });
 
       card.on("pointerup", (pointer, localX, localY) => {
