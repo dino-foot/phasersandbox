@@ -136,10 +136,9 @@ export const tweenBounceScaleUp = (context: Phaser.Scene, targets: Phaser.GameOb
 };
 
 // export const okeyDealingEvent = (context: Phaser.Scene, cardList: Phaser.GameObjects.Image[], pos: vector2, delay) => {
-
-  // setTimeout(() => {
-  //   okeyDealingTween(context, cardList, pos);
-  // }, delay);
+// setTimeout(() => {
+//   okeyDealingTween(context, cardList, pos);
+// }, delay);
 // };
 
 export const okeyDealingTween = (context: Phaser.Scene, cardList: Phaser.GameObjects.Image[], zoneList: Phaser.GameObjects.Zone[]) => {
