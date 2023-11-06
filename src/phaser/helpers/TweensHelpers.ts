@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Phaser from 'phaser';
+import { Scene, GameObjects } from 'phaser';
 import { Card } from '../objects';
 import { vector2 } from '../types';
 import _ from 'lodash';
 
 //? card shuffle animation
-export const shuffleCards_A = (context: Phaser.Scene, cardList: Card[], pos: vector2, completeCallback?: any): Phaser.Tweens.TweenChain => {
+export const shuffleCards_A = (context: Scene, cardList: Card[], pos: vector2, completeCallback?: any): Phaser.Tweens.TweenChain => {
   const tweenChain: Phaser.Tweens.TweenChain = context.tweens.chain({
     tweens: [
       {
@@ -37,7 +38,7 @@ export const shuffleCards_A = (context: Phaser.Scene, cardList: Card[], pos: vec
   return tweenChain;
 };
 
-export const matchCards_A = (context: Phaser.Scene, targetCard: Card, matchedCards: Card[], endPos: vector2, completeCallback?: any) => {
+export const matchCards_A = (context: Scene, targetCard: Card, matchedCards: Card[], endPos: vector2, completeCallback?: any) => {
   // reset pos to deck
   const allCards = matchedCards.concat(targetCard);
 
@@ -82,16 +83,16 @@ export const matchCards_A = (context: Phaser.Scene, targetCard: Card, matchedCar
 };
 
 //? shine for special card/s
-export const shineCards = (context: Phaser.Scene, cardList: Card[] | Phaser.GameObjects.GameObject[]) => {
+export const shineCards = (context: Scene, cardList: Card[] | GameObjects.GameObject[]) => {
   _.forEach(cardList, (card: Card) => {
     card.postFX.addShine(0.5, 0.25, 5);
   });
 };
 
 //? glow for special card/s
-export const glowCards = (context: Phaser.Scene, cardList: Card[] | Phaser.GameObjects.GameObject[], glowColor = 0xffff00, duration = 350, loopCount = -1, completeCallback?: any) => {
+export const addGlow = (context: Scene, cardList: Card[] | any[], glowColor = 0xffff00, duration = 350, loopCount = -1, completeCallback?: any) => {
   const fxList = [];
-  _.forEach(cardList, (card: Card) => {
+  _.forEach(cardList, (card: Card | any) => {
     const fx = card.postFX.addGlow(glowColor, 0, 0, false, 0.2, 16);
     fxList.push(fx);
   });
@@ -110,7 +111,7 @@ export const glowCards = (context: Phaser.Scene, cardList: Card[] | Phaser.GameO
   });
 };
 
-export const tweenBounceScaleUp = (context: Phaser.Scene, targets: Phaser.GameObjects.GameObject[], completeCallback?: any) => {
+export const tweenBounceScaleUp = (context: Scene, targets: GameObjects.GameObject[], completeCallback?: any) => {
   const tweenChain: Phaser.Tweens.TweenChain = context.tweens.chain({
     tweens: [
       {
@@ -141,7 +142,7 @@ export const tweenBounceScaleUp = (context: Phaser.Scene, targets: Phaser.GameOb
 // }, delay);
 // };
 
-export const okeyDealingTween = (context: Phaser.Scene, cardList: Phaser.GameObjects.Image[], zoneList: Phaser.GameObjects.Zone[]) => {
+export const okeyDealingTween = (context: Scene, cardList: GameObjects.Image[], zoneList: GameObjects.Zone[]) => {
   cardList.forEach((card, index) => {
     const zone = zoneList[index];
     const { x, y } = zone; // get zone position 
@@ -155,7 +156,7 @@ export const okeyDealingTween = (context: Phaser.Scene, cardList: Phaser.GameObj
 };
 
 
-export const tweenPosition = (context: Phaser.Scene, target: Phaser.GameObjects.GameObject, pos: vector2, data?: any, completeCallback?: any) => {
+export const tweenPosition = (context: Scene, target: GameObjects.GameObject, pos: vector2, data?: any, completeCallback?: any) => {
   context.tweens.add({
     targets: target,
     x: pos.x,
@@ -171,15 +172,3 @@ export const tweenPosition = (context: Phaser.Scene, target: Phaser.GameObjects.
   });
 };
 
-
-export const createDropZone = (context: Phaser.Scene, pos: vector2, debug=false): Phaser.GameObjects.Zone => {
-  //  A drop zone
-  const zone: Phaser.GameObjects.Zone = context.add.zone(pos.x, pos.y, 52, 80).setDropZone();
-  if (debug) {
-    //  Just a visual display of the drop zone
-    const graphics = context.add.graphics();
-    graphics.lineStyle(2, 0xffff00);
-    graphics.strokeRect(zone.x - zone.input.hitArea.width / 2, zone.y - zone.input.hitArea.height / 2, zone.input.hitArea.width, zone.input.hitArea.height);
-  }
-  return zone;
-};

@@ -4,7 +4,7 @@ import { Card } from '../objects';
 import {
   PhaserHelpers,
   confettiEffects,
-  glowCards,
+  addGlow,
   matchCards_A,
   shineCards,
   shuffleCards_A,
@@ -121,7 +121,7 @@ export class ScopaScene extends Phaser.Scene {
           cardList,
           { x: this.player.x - 100, y: this.player.y - 120 },
           () => {
-            glowCards(this, [cardList[2]]);
+            addGlow(this, [cardList[2]]);
           }
         );
         break;
@@ -135,8 +135,8 @@ export class ScopaScene extends Phaser.Scene {
         this.deck[2].setPosition(600, 300).show(); // matched
         this.deck[3].setPosition(700, 300).show(); // matched
 
-        glowCards(this, [this.deck[0]], 0xffc400, 350, 1);
-        glowCards(this, [this.deck[1], this.deck[3]], 0xffff00, 350, 1, () => {
+        addGlow(this, [this.deck[0]], 0xffc400, 350, 1);
+        addGlow(this, [this.deck[1], this.deck[3]], 0xffff00, 350, 1, () => {
           matchCards_A(this, this.deck[0], [this.deck[1], this.deck[3]], {
             x: 100,
             y: this.centerY
