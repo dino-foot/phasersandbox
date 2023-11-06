@@ -1,5 +1,3 @@
-/* eslint-disable max-len */
-/* eslint-disable prefer-const */
 import Phaser from 'phaser';
 import { GameObjects } from 'phaser';
 import _ from 'lodash';
@@ -161,7 +159,7 @@ export class OkeyScene extends Phaser.Scene {
         }
 
         if (this.lastDropZone && this.lastDropZone !== this.targetDropZone) {
-          addHighLight(dropZone);
+          addHighLight(this, dropZone);
         }
         // console.log(`dragenter >> target: ${gameObject.name} | last: ${dropZone?.name}`);
       });
@@ -192,7 +190,7 @@ export class OkeyScene extends Phaser.Scene {
         gameObject.depth -= 1;
         break;
       case "dragstart":
-        gameObject.setScale(1.25);
+        gameObject.setScale(1.15);
         gameObject.depth += 1;
         gameObject.angle = 5;
         // console.log(gameObject.depth);
@@ -240,6 +238,7 @@ export class OkeyScene extends Phaser.Scene {
         } else if (direction === 'left') {
           shiftLeftDirection(this, zoneList, targetIndex, occupiedZones, dropZone, gameObject);
         }
+        // clearHighLight(dropZone);
       }
       else {
         this.handleInvalidZone(gameObject);
@@ -256,13 +255,16 @@ export class OkeyScene extends Phaser.Scene {
     gameObject.setPosition(targetZone.x, targetZone.y);
     targetZone.setData("isOccupied", true);
     targetZone.setData("data", gameObject);
+    clearHighLight(targetZone);
   }
 
   resetZone() {
+    clearHighLight(this.targetDropZone);
+    clearHighLight(this.lastDropZone);
+
     this.lastDropZone?.setData("isOccupied", false);
     this.lastDropZone?.setData("data", null);
     this.lastDropZone = null;
-
     this.targetDropZone = null;
   }
 } // end class
