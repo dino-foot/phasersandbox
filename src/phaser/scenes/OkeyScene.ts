@@ -3,7 +3,7 @@
 import Phaser from 'phaser';
 import { GameObjects } from 'phaser';
 import _ from 'lodash';
-import { PhaserHelpers, createDropZone, determineZoneType, enableZoneDebugInput, getAdjacentOccupiedZones, okeyDealingTween, shiftLeftDirection, shiftRightDirection, tweenPosition, } from '../helpers';
+import { PhaserHelpers, addHighLight, clearHighLight, createDropZone, determineZoneType, enableZoneDebugInput, getAdjacentOccupiedZones, okeyDealingTween, shiftLeftDirection, shiftRightDirection, tweenPosition, } from '../helpers';
 import { ShapeSettings } from '../settings/ShapeSettings';
 import { TextSettings } from '../settings/TextSettings';
 
@@ -142,6 +142,7 @@ export class OkeyScene extends Phaser.Scene {
       //? ----- object events ------
       card.on("drag", (pointer, dragX, dragY) => {
         this.handleDragEvents("drag", pointer, card, dragX, dragY, null);
+
       });
 
       card.on("dragend", (pointer, dragX, dragY, dropped) => {
@@ -158,11 +159,17 @@ export class OkeyScene extends Phaser.Scene {
         if (this.lastDropZone === null) {
           this.lastDropZone = this.targetDropZone;
         }
-        // console.log(`dragenter >> target: ${occupiedZones.length} | last: ${this.lastDropZone?.name}`);
+
+        if (this.lastDropZone && this.lastDropZone !== this.targetDropZone) {
+          addHighLight(dropZone);
+        }
+        // console.log(`dragenter >> target: ${gameObject.name} | last: ${dropZone?.name}`);
       });
 
       this.input.on("dragleave", (pointer, gameObject, dropZone) => {
         this.targetDropZone = null;
+        clearHighLight(dropZone);
+        // console.log('dragleave ', dropZone.name);
       });
 
       card.on("pointerup", (pointer, localX, localY) => {
