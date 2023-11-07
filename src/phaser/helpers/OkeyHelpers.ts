@@ -4,11 +4,10 @@ import { GameObjects, Scene } from 'phaser';
 import _ from 'lodash';
 
 
-export function getAdjacentOccupiedZones(zones:GameObjects.Zone[], targetZone:GameObjects.Zone): any {
+export function getAdjacentOccupiedZones(zones: GameObjects.Zone[], targetZone: GameObjects.Zone): any {
     const targetIndex = zones.findIndex((zone) => zone.name === targetZone.name);
     let occupiedZones = [];
     let direction = null;
-
     if (targetIndex !== -1) {
         // Check right adjacent zones if the target index is valid
         for (let i = targetIndex; i < zones.length; i++) {
@@ -16,7 +15,7 @@ export function getAdjacentOccupiedZones(zones:GameObjects.Zone[], targetZone:Ga
                 direction = 'right';
                 return { occupiedZones, direction };
             }
-            // occupiedZones.push(i);
+            // console.log('right ', zones[i].getData('data').name)
             occupiedZones.push(zones[i]);
         }
 
@@ -26,15 +25,44 @@ export function getAdjacentOccupiedZones(zones:GameObjects.Zone[], targetZone:Ga
             for (let i = targetIndex; i >= 0; i--) {
                 if (!zones[i].getData("isOccupied")) {
                     direction = 'left';
-                    return { occupiedZones, direction }; // Stop checking left adjacent zones if an unoccupied zone is found
+                    break;
+                    // return { occupiedZones, direction }; // Stop checking left adjacent zones if an unoccupied zone is found
                 }
-                // occupiedZones.push(i);
                 occupiedZones.push(zones[i]);
             }
         }
     }
 
     return { occupiedZones, direction }; // Return the entire list if all zones are occupied
+}
+
+export function getAdjacentCards(zones: GameObjects.Zone[], targetZone: GameObjects.Zone) {
+    const targetIndex = zones.findIndex((zone) => zone.name === targetZone.name);
+    let adjacentCards = [];
+
+    for (let i = targetIndex - 1; i >= 0; i--) {
+        if (zones[i].getData("isOccupied") === false) {
+            break;
+        }
+        adjacentCards.unshift(zones[i].getData('data'));
+    }
+
+    for (let i = targetIndex; i < zones.length; i++) {
+        if (zones[i].getData("isOccupied") === false) {
+            break;
+        }
+        adjacentCards.push(zones[i].getData('data'));
+      }
+    return adjacentCards;
+}
+
+export function getGroupedCards(cards) {
+    const okeyLabel = ["black", "blue", "red", "yellow"];
+
+    const groupedCards = _.groupBy(cards, card => card.name.split('_')[0]);
+    const filteredGroups = _.pick(groupedCards, okeyLabel);
+    const group = _.pickBy(filteredGroups, group => group.length >= 3);
+    return group;
 }
 
 export function shiftRightDirection(scene, zoneList: GameObjects.Zone[], targetIndex: number, occupiedZones: GameObjects.Zone[], dropZone, gameObject) {
@@ -72,48 +100,7 @@ export function shiftLeftDirection(scene, zoneList: GameObjects.Zone[], targetIn
     scene.assignToZone(gameObject, dropZone);
     scene.resetZone();
 }
-  
-// export function checkGroup(scene, zones: GameObjects.Zone[], targetZone: GameObjects.Zone) {
-//   const targetIndex = zones.findIndex((zone) => zone.name === targetZone.name);
-//   let leftAdjacentCards = [];
-//   let rightAdjacentCards = [];
-//   let adjacentCards = [];
-  
-//   rightAdjacentCards.push(targetZone.getData('data'));
 
-//   if (targetIndex !== -1) {
-//     // Check right adjacent zones if the target index is valid
-//     for (let i = targetIndex + 1; i < zones.length; i++) {
-//       if (!zones[i].getData("isOccupied")) {
-//         break;
-//       }
-//       // occupiedZones.push(i);
-//       rightAdjacentCards.push(zones[i].getData('data'));
-//     }
-
-//     // Check left adjacent zones if no unoccupied zone is found on the right
-//       for (let i = targetIndex - 1; i >= 0; i--) {
-//       if (!zones[i].getData("isOccupied")) {
-//         break; // Stop checking left adjacent zones if an unoccupied zone is found
-//       }
-//       // occupiedZones.push(i);
-//       leftAdjacentCards.push(zones[i].getData('data'));
-//     }
-//   }
-//   adjacentCards = _.concat(leftAdjacentCards.reverse(), rightAdjacentCards);
-//   return adjacentCards;
-// }
-
-export function findAdjacentGroupsByClor(colors) {
-    const groupedColors = _.groupBy(colors, (color, index, array) => {
-        if (index === 0 || color !== array[index - 1]) {
-            return color;
-        }
-    });
-
-    const validGroups = _.filter(groupedColors, (group) => group && group.length >= 3);
-    return validGroups;
-}
 
 export function tweenCardToPos(context: Scene, card: GameObjects.Image, pos: vector2, completeCallback?:any) {
     const tweenConfig = { scale: { from: 1.5, to: 1 } };
@@ -122,8 +109,36 @@ export function tweenCardToPos(context: Scene, card: GameObjects.Image, pos: vec
     });
 }
 
-export function addHighLight(scene: Scene, zone: GameObjects.Zone) {
+export function getCardsNamesFromZone(zones) {
+    const cards = [];
+    zones.forEach(zone => {
+        if (zone.getData('data')) {
+            cards.push(zone.getData('data').name);
+        }
+    });
+    return cards;
+}
 
+export function getCardsFromZone(zones) {
+    const cards = [];
+    zones.forEach(zone => {
+        if (zone.getData('data')) {
+            cards.push(zone.getData('data'));
+        }
+    });
+    return cards;
+}
+
+export function getCardsNames(cards) {
+    const names = [];
+    cards.forEach(card => {
+        names.push(card.name);
+    });
+    return names;
+}
+
+export function addHighLight(scene: Scene, zone: GameObjects.Zone) {
+    if (zone === null) return;
     if (zone['isHighLighted'] === true) return;
 
     // if occupied > highlight card 
@@ -143,6 +158,8 @@ export function addHighLight(scene: Scene, zone: GameObjects.Zone) {
 }
 
 export function clearHighLight(zone: GameObjects.Zone) {
+    if (zone === null) return;
+
     if (zone['isHighLighted']) {
         const card = zone.getData('data');
         if (card?.isTinted) {
