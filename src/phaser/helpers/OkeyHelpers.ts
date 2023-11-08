@@ -111,34 +111,6 @@ export function tweenCardToPos(context: Scene, card: GameObjects.Image, pos: vec
     });
 }
 
-export function getCardsNamesFromZone(zones) {
-    const cards = [];
-    zones.forEach(zone => {
-        if (zone.getData('data')) {
-            cards.push(zone.getData('data').name);
-        }
-    });
-    return cards;
-}
-
-export function getCardsFromZone(zones) {
-    const cards = [];
-    zones.forEach(zone => {
-        if (zone.getData('data')) {
-            cards.push(zone.getData('data'));
-        }
-    });
-    return cards;
-}
-
-export function getCardsNames(cards) {
-    const names = [];
-    cards.forEach(card => {
-        names.push(card.name);
-    });
-    return names;
-}
-
 export function addHighLight(scene: Scene, zone: GameObjects.Zone) {
     if (zone === null) return;
     if (zone['isHighLighted'] === true) return;
@@ -276,13 +248,42 @@ export function createContainer(scene: Scene, width: number, height: number, deb
     const container = scene.add?.container(0, 0);
     // container.setDepth(100);
     container.setSize(width, height);
-  
+
     if (debugFill) {
-      const rect = new Phaser.Geom.Rectangle(-width / 2, -height / 2, width, height);
-      const graphics = scene.add.graphics();
-      graphics.fillRectShape(rect).fillStyle(0xfffff);
-      graphics.setName('mask');
-      container.add(graphics);
+        const rect = new Phaser.Geom.Rectangle(-width / 2, -height / 2, width, height);
+        const graphics = scene.add.graphics();
+        graphics.fillRectShape(rect).fillStyle(0xfffff);
+        graphics.setName('mask');
+        container.add(graphics);
     }
     return container;
-  }
+}
+
+
+export function getCardsNamesFromZone(zones) {
+    const cards = [];
+    zones.forEach(zone => {
+        if (zone.getData('data')) {
+            cards.push(zone.getData('data').name);
+        }
+    });
+    return cards;
+}
+
+export function getCardsFromZone(zones) {
+    const cards = [];
+    zones.forEach(zone => {
+        if (zone.getData('data')) {
+            cards.push(zone.getData('data'));
+        }
+    });
+    return cards;
+}
+
+export function getCardsNames(cards) {
+    const names = [];
+    cards.forEach(card => {
+        names.push(card.name);
+    });
+    return names;
+}
