@@ -1,7 +1,10 @@
 import Phaser from 'phaser';
 import { GameObjects } from 'phaser';
 import _ from 'lodash';
-import { PhaserHelpers, addHighLight, clearHighLight, createDropZone, determineZoneType, enableZoneDebugInput, getAdjacentOccupiedZones, okeyDealingTween, shiftLeftDirection, shiftRightDirection, tweenPosition, } from '../helpers';
+import {
+  PhaserHelpers, addHighLight, clearHighLight, createDropZone, determineZoneType, enableZoneDebugInput, getAdjacentOccupiedZones,
+  okeyDealingTween, shiftLeftDirection, shiftRightDirection, tweenPosition, getCardsNamesFromZone, getCardsNames, getCardsFromZone, getAdjacentCards, getGroupedCards, createRectangle, addGlow
+} from '../helpers';
 import { ShapeSettings } from '../settings/ShapeSettings';
 import { TextSettings } from '../settings/TextSettings';
 
@@ -21,13 +24,14 @@ export class OkeyScene extends Phaser.Scene {
   cardWidth = 52;
   cardHeight = 76;
   resetButton: GameObjects.Text;
+
   constructor() {
     super("okey");
   }
 
   init() {
     console.log("okey-init");
-    
+
     this.targetDropZone = null;
     this.lastDropZone = null;
     this.zoneList = [];
@@ -83,13 +87,7 @@ export class OkeyScene extends Phaser.Scene {
   }
 
   // todo
-  // stone dealing (done)
-  // stones grouping (done)
-  // implement desktop drag and drop individual stone (done)
   //? implement desktop drag and drop grouped stones.  The "group move" button appears when you hover on a group. (wip)
-  // implement mobile drag and drop individual stone (done)
-
-  //? fix scopa scaling
 
   create() {
     this.dealStone = PhaserHelpers.addText(TextSettings.DEAL_CARDS, this);
@@ -215,6 +213,47 @@ export class OkeyScene extends Phaser.Scene {
       // empty zone
       this.assignToZone(gameObject, dropZone);
 
+      const zoneList = determineZoneType(dropZone.name) === "top" ? this.zoneTop : this.zoneBottom;
+      const adjacentCards = getAdjacentCards(zoneList, dropZone);
+      const groupedCards = getGroupedCards(adjacentCards);
+
+      // todo 
+      // create a group add them in a group 
+      // highlight 
+      // on hover drag icon 
+      // drag n drop 
+      // check if there  any empty zone.length = graup length 
+      
+      for (const key in groupedCards) {
+        if (groupedCards[key].length > 0) {
+
+          const startCard = groupedCards[key][0];
+          groupedCards[key].container = this.add.container(startCard.x, startCard.y);
+          groupedCards[key].container.setSize(this.cardWidth * groupedCards[key].length, this.cardHeight);
+          groupedCards[key].container.setInteractive();
+          this.input.setDraggable(groupedCards[key].container);
+
+          const rect = createRectangle(this, { x: startCard.x + this.cardWidth, y: startCard.y }, this.cardWidth * groupedCards[key].length, this.cardHeight);
+          groupedCards[key].rect = rect;
+          
+          addGlow(this, [rect]);
+          _.forEach(groupedCards[key], (card, index) => {
+            card.setPosition(index * this.cardWidth, 0);
+            card?.setAlpha(0.8);
+            groupedCards[key].container.add(card);
+          });
+        }
+      }
+
+      if (groupedCards.hasOwnProperty('black')) {
+        if (groupedCards['black'].length > 0) {
+          groupedCards['black'].container.setPosition(100, 100);
+        }
+      }
+
+      console.log('grouped cards ', groupedCards);
+
+
       if (this.lastDropZone && this.lastDropZone !== this.targetDropZone) {
         this.resetZone();
       }
@@ -222,14 +261,14 @@ export class OkeyScene extends Phaser.Scene {
       //? handle occupied zone
       const zoneList = determineZoneType(dropZone.name) === "top" ? this.zoneTop : this.zoneBottom;
       const { occupiedZones, direction } = getAdjacentOccupiedZones(zoneList, dropZone);
-      
+     
       // all zones are filled 
       if (direction === null) {
         this.handleInvalidZone(gameObject);
         return;
       }
       // console.log({ occupiedZones, direction });
-      // console.log(`target ${this.targetDropZone.name} last ${this.lastDropZone.name} card ${gameObject.name}`);
+      // console.log(`target ${this.targetDropZone.getData('data')?.name} last ${this.lastDropZone.getData('data')?.name} card ${gameObject.name}`);
 
       if (occupiedZones.length > 1 && this.targetDropZone !== this.lastDropZone) {
         const targetIndex = zoneList.findIndex((zone) => zone.name === dropZone.name);
@@ -238,7 +277,6 @@ export class OkeyScene extends Phaser.Scene {
         } else if (direction === 'left') {
           shiftLeftDirection(this, zoneList, targetIndex, occupiedZones, dropZone, gameObject);
         }
-        // clearHighLight(dropZone);
       }
       else {
         this.handleInvalidZone(gameObject);
