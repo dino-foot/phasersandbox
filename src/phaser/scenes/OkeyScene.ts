@@ -1,11 +1,10 @@
 import Phaser from 'phaser';
-import { GameObjects } from 'phaser';
+import { GameObjects, Scene } from 'phaser';
 import _ from 'lodash';
 import {
-  PhaserHelpers, addHighLight, clearHighLight, createDropZone, determineZoneType, enableZoneDebugInput, getAdjacentOccupiedZones,
-  okeyDealingTween, shiftLeftDirection, shiftRightDirection, tweenPosition, getCardsNamesFromZone, getCardsNames, getCardsFromZone, getAdjacentCards, getGroupedCards, createRectangle, addGlow
+  PhaserHelpers, addHighLight, clearHighLight, determineZoneType, getAdjacentOccupiedZones, okeyDealingTween, shiftLeftDirection, shiftRightDirection, 
+  tweenPosition, getCardsNamesFromZone, getCardsNames, getCardsFromZone, getAdjacentCards, getGroupedCards, createRectangle, addGlow, createDragNDropArea
 } from '../helpers';
-import { ShapeSettings } from '../settings/ShapeSettings';
 import { TextSettings } from '../settings/TextSettings';
 
 export class OkeyScene extends Phaser.Scene {
@@ -44,44 +43,11 @@ export class OkeyScene extends Phaser.Scene {
     bg.setOrigin(0.5);
     bg.setScale(2);
 
-    // create prototype lavel with graphics/geom
-    this.topPlatform = PhaserHelpers.addRectangle(ShapeSettings.Rectangle_top, this);
-    this.bottomPlatform = PhaserHelpers.addRectangle(ShapeSettings.Rectangle_bottom, this);
 
-    this.topPlatform.setPosition(this.centerX, this.game.canvas.height - 500);
-    this.bottomPlatform.setPosition(this.centerX, this.game.canvas.height - 350);
-
-    if (this.sys.game.device.os.android || this.sys.game.device.os.iOS) {
-      this.topPlatform.y -= 200;
-      this.bottomPlatform.y -= 200;
-    }
-    
-    // create drop zone for cards
-    const topStartX = this.topPlatform.x + this.cardWidth / 2 - this.topPlatform.width / 2;
-    const topStartY = this.topPlatform.y + this.cardHeight / 2 - this.topPlatform.height / 2;
-
-    const bottomStartX = this.bottomPlatform.x + this.cardWidth / 2 - this.bottomPlatform.width / 2;
-    const bottomStartY = this.bottomPlatform.y + this.cardHeight / 2 - this.bottomPlatform.height / 2;
-
-    for (let i = 0; i < Math.round(this.topPlatform.width / this.cardWidth); i++) {
-      const zone = createDropZone(this, { x: topStartX + i * this.cardWidth, y: topStartY }, true);
-      zone.setName(`zone_top_${i}`);
-      zone.setData("isOccupied", false);
-      this.zoneTop.push(zone);
-      this.zoneList.push(zone);
-      // debug
-      // enableZoneDebugInput(this, zone);
-    }
-
-    for (let i = 0; i < Math.round(this.bottomPlatform.width / this.cardWidth); i++) {
-      const zone = createDropZone(this, { x: bottomStartX + i * this.cardWidth, y: bottomStartY }, true);
-      zone.setName(`zone_bottom_${i}`);
-      zone.setData("isOccupied", false);
-      this.zoneBottom.push(zone);
-      this.zoneList.push(zone);
-      // debug
-      // enableZoneDebugInput(this, zone);
-    }
+    const { top, bottom, list } = createDragNDropArea(this, this.cardWidth, this.cardHeight);
+    this.zoneTop = top;
+    this.zoneBottom = bottom;
+    this.zoneList = list;
 
     this.createDeck();
   }
@@ -235,7 +201,7 @@ export class OkeyScene extends Phaser.Scene {
 
           const rect = createRectangle(this, { x: startCard.x + this.cardWidth, y: startCard.y }, this.cardWidth * groupedCards[key].length, this.cardHeight);
           groupedCards[key].rect = rect;
-          
+
           addGlow(this, [rect]);
           _.forEach(groupedCards[key], (card, index) => {
             card.setPosition(index * this.cardWidth, 0);

@@ -2,6 +2,8 @@ import { vector2 } from "../types";
 import { addGlow, tweenPosition } from "./TweensHelpers";
 import { GameObjects, Scene } from 'phaser';
 import _ from 'lodash';
+import { PhaserHelpers } from "./PhaserHelpers";
+import { ShapeSettings } from "../settings/ShapeSettings";
 
 
 export function getAdjacentOccupiedZones(zones: GameObjects.Zone[], targetZone: GameObjects.Zone): any {
@@ -219,3 +221,54 @@ export function enableZoneDebugInput(context: Scene, zone: Phaser.GameObjects.Zo
       this
     );
 }
+
+export function createDragNDropArea(scene: Scene, cardWidth:number, cardHeight:number) {
+    const centerX = scene.cameras.main.centerX;
+    // const centerY = scene.cameras.main.centerY;
+
+    const topPlatform = PhaserHelpers.addRectangle(ShapeSettings.Rectangle_top, scene);
+    const bottomPlatform = PhaserHelpers.addRectangle(ShapeSettings.Rectangle_bottom, scene);
+
+    topPlatform.setPosition(centerX, scene.game.canvas.height - 500);
+    bottomPlatform.setPosition(centerX, scene.game.canvas.height - 350);
+
+    // todo fix later
+    if (scene.sys.game.device.os.android || scene.sys.game.device.os.iOS) {
+        topPlatform.y -= 200;
+        bottomPlatform.y -= 200;
+    }
+
+    const topStartX = topPlatform.x + cardWidth / 2 - topPlatform.width / 2;
+    const topStartY = topPlatform.y + cardHeight / 2 - topPlatform.height / 2;
+
+    const bottomStartX = bottomPlatform.x + cardWidth / 2 - bottomPlatform.width / 2;
+    const bottomStartY = bottomPlatform.y + cardHeight / 2 - bottomPlatform.height / 2;
+
+    const zoneTop = [];
+    const zoneBottom = [];
+    const zoneList = [];
+
+    for (let i = 0; i < Math.round(topPlatform.width / cardWidth); i++) {
+        const zone = createDropZone(scene, { x: topStartX + i * cardWidth, y: topStartY }, true);
+        zone.setName(`zone_top_${i}`);
+        zone.setData("isOccupied", false);
+        zoneTop.push(zone);
+        zoneList.push(zone);
+        // debug
+        // enableZoneDebugInput(scene, zone);
+    }
+
+    for (let i = 0; i < Math.round(bottomPlatform.width / cardWidth); i++) {
+        const zone = createDropZone(scene, { x: bottomStartX + i * cardWidth, y: bottomStartY }, true);
+        zone.setName(`zone_bottom_${i}`);
+        zone.setData("isOccupied", false);
+        zoneBottom.push(zone);
+        zoneList.push(zone);
+        // debug
+        // enableZoneDebugInput(scene, zone);
+    }
+
+    // Return the created zones or other necessary data if needed
+    return { top: zoneTop, bottom: zoneBottom, list: zoneList };
+}
+  
