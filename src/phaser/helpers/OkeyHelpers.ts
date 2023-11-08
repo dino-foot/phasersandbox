@@ -227,7 +227,7 @@ export function createDragNDropArea(scene: Scene, cardWidth:number, cardHeight:n
         zoneTop.push(zone);
         zoneList.push(zone);
         // debug
-        // enableZoneDebugInput(scene, zone);
+        enableZoneDebugInput(scene, zone);
     }
 
     for (let i = 0; i < Math.round(bottomPlatform.width / cardWidth); i++) {
@@ -237,7 +237,7 @@ export function createDragNDropArea(scene: Scene, cardWidth:number, cardHeight:n
         zoneBottom.push(zone);
         zoneList.push(zone);
         // debug
-        // enableZoneDebugInput(scene, zone);
+        enableZoneDebugInput(scene, zone);
     }
 
     // Return the created zones or other necessary data if needed

@@ -212,12 +212,36 @@ export class OkeyScene extends Phaser.Scene {
         }
         else {
           // occupied zone
-          this.handleInvalidZone(gameObject);
+          // this.handleInvalidZone(gameObject);
+          console.log('occupied zone 0');
+          this.handleShifting(gameObject, dropZone);
         }
         break;
     }
   } // end
 
+
+  handleShifting(gameObject, dropZone) {
+    const zoneList = this.getTargetZoneList(dropZone);
+    const { occupiedZones, direction } = getAdjacentOccupiedZones(zoneList, dropZone);
+    console.log({occupiedZones, direction});
+
+    // all zones are filled 
+    if (direction === null) {
+      this.handleInvalidZone(gameObject);
+      return;
+    }
+
+    if (occupiedZones.length > 0 && this.targetDropZone !== this.lastDropZone) {
+      const targetIndex = this.getZoneIndex(dropZone);
+      if (direction === 'right') {
+        shiftRightDirection(this, zoneList, targetIndex, occupiedZones, dropZone, gameObject);
+      } else if (direction === 'left') {
+        shiftLeftDirection(this, zoneList, targetIndex, occupiedZones, dropZone, gameObject);
+      }
+    }
+    
+  }
 
   handleInvalidZone(gameObject) {
     tweenPosition(this, gameObject, { x: gameObject.input.dragStartX, y: gameObject.input.dragStartY });
