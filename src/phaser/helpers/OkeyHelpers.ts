@@ -272,3 +272,17 @@ export function createDragNDropArea(scene: Scene, cardWidth:number, cardHeight:n
     return { top: zoneTop, bottom: zoneBottom, list: zoneList };
 }
   
+export function createContainer(scene: Scene, width: number, height: number, debugFill?: boolean): Phaser.GameObjects.Container {
+    const container = scene.add?.container(0, 0);
+    // container.setDepth(100);
+    container.setSize(width, height);
+  
+    if (debugFill) {
+      const rect = new Phaser.Geom.Rectangle(-width / 2, -height / 2, width, height);
+      const graphics = scene.add.graphics();
+      graphics.fillRectShape(rect).fillStyle(0xfffff);
+      graphics.setName('mask');
+      container.add(graphics);
+    }
+    return container;
+  }
