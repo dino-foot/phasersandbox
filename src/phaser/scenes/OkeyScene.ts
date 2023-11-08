@@ -160,9 +160,6 @@ export class OkeyScene extends Phaser.Scene {
       const groupedCards = getGroupedCards(adjacentCards);
 
       // todo 
-      // create a group add them in a group 
-      // highlight 
-      // on hover drag icon 
       // drag n drop 
       // check if there  any empty zone.length = graup length 
 
@@ -183,10 +180,16 @@ export class OkeyScene extends Phaser.Scene {
           // attach event 
           groupedCards[key].container.setInteractive();
           this.input.setDraggable(groupedCards[key].container);
+          
           groupedCards[key].container.on('pointerover', (pointer, gameObject) => { this.handleGroupDranNDrop('pointerover', groupedCards[key]) }, this);
           groupedCards[key].container.on('pointerout', (pointer, gameObject) => { this.handleGroupDranNDrop('pointerout', groupedCards[key]) }, this);
           groupedCards[key].container.on("drag", (pointer, dragX, dragY) => {
             this.handleGroupDranNDrop('drag', groupedCards[key], dragX, dragY)
+          });
+
+          this.input.on('drop', (pointer, container, dropZone) => {
+            // console.log('drop ', dropZone.name);
+            this.handleGroupDranNDrop('drag', container, null, null, dropZone);
           });
 
           // highlight 
@@ -240,7 +243,7 @@ export class OkeyScene extends Phaser.Scene {
     }
   }
 
-  handleGroupDranNDrop(event: 'pointerover' | 'pointerout' | 'drag', group, dragX?, dragY?) {
+  handleGroupDranNDrop(event: 'pointerover' | 'pointerout' | 'drag' | 'drop', group, dragX?, dragY?, dropZone?) {
     switch (event) {
       case "pointerover":
         // console.log('over');
@@ -253,14 +256,17 @@ export class OkeyScene extends Phaser.Scene {
       case "pointerout":
         group.dragIcon?.setVisible(false);
         _.forEach(group.container.getAll(), (child, index) => {
-          child.setAlpha(0.8);
+          child.setAlpha(1);
         });
         break;
       case "drag":
-        group.dragIcon?.setPosition(dragX, dragY);
+        Phaser.Display.Align.In.TopRight(group.dragIcon,  group.container, 20, 25);
         group.dragIcon?.setVisible(false);
         group.container.setPosition(dragX, dragY);
         group.rect.setPosition(dragX, dragY);
+        break;
+      case "drop":
+
         break;
     }
   }
