@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { GameObjects, Scene } from 'phaser';
 import _ from 'lodash';
 import {
-  PhaserHelpers, addHighLight, clearHighLight, determineZoneType, getAdjacentOccupiedZones, okeyDealingTween, shiftLeftDirection, shiftRightDirection, 
+  PhaserHelpers, addHighLight, clearHighLight, determineZoneType, getAdjacentOccupiedZones, okeyDealingTween, shiftLeftDirection, shiftRightDirection,
   tweenPosition, getCardsNamesFromZone, getCardsNames, getCardsFromZone, getAdjacentCards, getGroupedCards, createRectangle, addGlow, createDragNDropArea, createContainer
 } from '../helpers';
 import { TextSettings } from '../settings/TextSettings';
@@ -98,7 +98,7 @@ export class OkeyScene extends Phaser.Scene {
       const card = this.add.image(posX, posY, "okey-stones", i);
       card.depth = 10;
       card.setName(`${this.okeyLabel[labelIndex]}_${stoneNumber}`);
-      card.setInteractive({ draggable: true, useHandCursor: true,  });
+      card.setInteractive({ draggable: true, useHandCursor: true, });
       this.deck.push(card);
 
       //? ----- object events ------
@@ -158,14 +158,14 @@ export class OkeyScene extends Phaser.Scene {
       const zoneList = determineZoneType(dropZone.name) === "top" ? this.zoneTop : this.zoneBottom;
       const adjacentCards = getAdjacentCards(zoneList, dropZone);
       const groupedCards = getGroupedCards(adjacentCards);
-     
+
       // todo 
       // create a group add them in a group 
       // highlight 
       // on hover drag icon 
       // drag n drop 
       // check if there  any empty zone.length = graup length 
-      
+
       for (const key in groupedCards) {
         if (groupedCards[key].length > 0) {
 
@@ -175,8 +175,8 @@ export class OkeyScene extends Phaser.Scene {
           groupedCards[key].container.setPosition(startCard.x + this.cardWidth, startCard.y);
           // groupedCards[key].container.setDepth(11);
           // console.log('width ', this.cardWidth * groupedCards[key].length);
-          
-          groupedCards[key].dragIcon = this.add.image(0,0, 'plus-icon').setName('plus-icon').setScale(1.1).setDepth(11);
+
+          groupedCards[key].dragIcon = this.add.image(0, 0, 'plus-icon').setName('plus-icon').setScale(1.1).setDepth(11);
           Phaser.Display.Align.In.TopRight(groupedCards[key].dragIcon, groupedCards[key].container, 20, 25);
           // groupedCards[key].container.add(dragIcon);
 
@@ -188,7 +188,7 @@ export class OkeyScene extends Phaser.Scene {
           groupedCards[key].container.on("drag", (pointer, dragX, dragY) => {
             this.handleGroupDranNDrop('drag', groupedCards[key], dragX, dragY)
           });
-          
+
           // highlight 
           const containerBounds = groupedCards[key].container.input.hitArea;
           const rect = createRectangle(this, { x: groupedCards[key].container.x, y: groupedCards[key].container.y }, containerBounds.width, containerBounds.height);
@@ -196,7 +196,7 @@ export class OkeyScene extends Phaser.Scene {
 
           addGlow(this, [rect], 0x33FF93, 350, 2);
           _.forEach(groupedCards[key], (card, index) => {
-            card?.setPosition((index-1) * this.cardWidth, 0);
+            card?.setPosition((index - 1) * this.cardWidth, 0);
             card?.setAlpha(0.8);
             card.input.enabled = false;
             groupedCards[key].container.add(card);
@@ -214,7 +214,7 @@ export class OkeyScene extends Phaser.Scene {
       //? handle occupied zone
       const zoneList = determineZoneType(dropZone.name) === "top" ? this.zoneTop : this.zoneBottom;
       const { occupiedZones, direction } = getAdjacentOccupiedZones(zoneList, dropZone);
-     
+
       // all zones are filled 
       if (direction === null) {
         this.handleInvalidZone(gameObject);
@@ -234,7 +234,7 @@ export class OkeyScene extends Phaser.Scene {
       // else {
       //   this.handleInvalidZone(gameObject);
       // }
-      
+
       // testing
       this.handleInvalidZone(gameObject);
     }
