@@ -186,7 +186,7 @@ export function determineZoneType(zoneName: string) {
     }
 }
 
-function createRectangle(scene: Scene, pos: vector2, width, height) {
+export function createRectangle(scene: Scene, pos: vector2, width, height) {
     const graphics = scene.add.graphics();
     graphics.setDepth(9);
     graphics.lineStyle(5, 0xff00ff);
