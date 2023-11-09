@@ -2,13 +2,14 @@ import { vector2 } from "../types";
 import { addGlow, tweenPosition } from "./TweensHelpers";
 import { GameObjects, Scene } from 'phaser';
 import _ from 'lodash';
+import { PhaserHelpers } from "./PhaserHelpers";
+import { ShapeSettings } from "../settings/ShapeSettings";
 
 
-export function getAdjacentOccupiedZones(zones:GameObjects.Zone[], targetZone:GameObjects.Zone): any {
+export function getAdjacentOccupiedZones(zones: GameObjects.Zone[], targetZone: GameObjects.Zone): any {
     const targetIndex = zones.findIndex((zone) => zone.name === targetZone.name);
     let occupiedZones = [];
     let direction = null;
-
     if (targetIndex !== -1) {
         // Check right adjacent zones if the target index is valid
         for (let i = targetIndex; i < zones.length; i++) {
@@ -16,7 +17,7 @@ export function getAdjacentOccupiedZones(zones:GameObjects.Zone[], targetZone:Ga
                 direction = 'right';
                 return { occupiedZones, direction };
             }
-            // occupiedZones.push(i);
+            // console.log('right ', zones[i].getData('data').name)
             occupiedZones.push(zones[i]);
         }
 
@@ -26,15 +27,44 @@ export function getAdjacentOccupiedZones(zones:GameObjects.Zone[], targetZone:Ga
             for (let i = targetIndex; i >= 0; i--) {
                 if (!zones[i].getData("isOccupied")) {
                     direction = 'left';
-                    return { occupiedZones, direction }; // Stop checking left adjacent zones if an unoccupied zone is found
+                    break;
+                    // return { occupiedZones, direction }; // Stop checking left adjacent zones if an unoccupied zone is found
                 }
-                // occupiedZones.push(i);
                 occupiedZones.push(zones[i]);
             }
         }
     }
 
     return { occupiedZones, direction }; // Return the entire list if all zones are occupied
+}
+
+export function getAdjacentCards(zones: GameObjects.Zone[], targetZone: GameObjects.Zone) {
+    const targetIndex = zones.findIndex((zone) => zone.name === targetZone.name);
+    let adjacentCards = [];
+
+    for (let i = targetIndex - 1; i >= 0; i--) {
+        if (zones[i].getData("isOccupied") === false) {
+            break;
+        }
+        adjacentCards.unshift(zones[i].getData('data'));
+    }
+
+    for (let i = targetIndex; i < zones.length; i++) {
+        if (zones[i].getData("isOccupied") === false) {
+            break;
+        }
+        adjacentCards.push(zones[i].getData('data'));
+      }
+    return adjacentCards;
+}
+
+export function getGroupedCards(cards) {
+    const okeyLabel = ["black", "blue", "red", "yellow"];
+
+    const groupedCards = _.groupBy(cards, card => card.name.split('_')[0]);
+    const filteredGroups = _.pick(groupedCards, okeyLabel);
+    const group = _.pickBy(filteredGroups, group => group.length >= 3);
+    return group;
 }
 
 export function shiftRightDirection(scene, zoneList: GameObjects.Zone[], targetIndex: number, occupiedZones: GameObjects.Zone[], dropZone, gameObject) {
@@ -72,48 +102,7 @@ export function shiftLeftDirection(scene, zoneList: GameObjects.Zone[], targetIn
     scene.assignToZone(gameObject, dropZone);
     scene.resetZone();
 }
-  
-// export function checkGroup(scene, zones: GameObjects.Zone[], targetZone: GameObjects.Zone) {
-//   const targetIndex = zones.findIndex((zone) => zone.name === targetZone.name);
-//   let leftAdjacentCards = [];
-//   let rightAdjacentCards = [];
-//   let adjacentCards = [];
-  
-//   rightAdjacentCards.push(targetZone.getData('data'));
 
-//   if (targetIndex !== -1) {
-//     // Check right adjacent zones if the target index is valid
-//     for (let i = targetIndex + 1; i < zones.length; i++) {
-//       if (!zones[i].getData("isOccupied")) {
-//         break;
-//       }
-//       // occupiedZones.push(i);
-//       rightAdjacentCards.push(zones[i].getData('data'));
-//     }
-
-//     // Check left adjacent zones if no unoccupied zone is found on the right
-//       for (let i = targetIndex - 1; i >= 0; i--) {
-//       if (!zones[i].getData("isOccupied")) {
-//         break; // Stop checking left adjacent zones if an unoccupied zone is found
-//       }
-//       // occupiedZones.push(i);
-//       leftAdjacentCards.push(zones[i].getData('data'));
-//     }
-//   }
-//   adjacentCards = _.concat(leftAdjacentCards.reverse(), rightAdjacentCards);
-//   return adjacentCards;
-// }
-
-export function findAdjacentGroupsByClor(colors) {
-    const groupedColors = _.groupBy(colors, (color, index, array) => {
-        if (index === 0 || color !== array[index - 1]) {
-            return color;
-        }
-    });
-
-    const validGroups = _.filter(groupedColors, (group) => group && group.length >= 3);
-    return validGroups;
-}
 
 export function tweenCardToPos(context: Scene, card: GameObjects.Image, pos: vector2, completeCallback?:any) {
     const tweenConfig = { scale: { from: 1.5, to: 1 } };
@@ -123,7 +112,7 @@ export function tweenCardToPos(context: Scene, card: GameObjects.Image, pos: vec
 }
 
 export function addHighLight(scene: Scene, zone: GameObjects.Zone) {
-
+    if (zone === null) return;
     if (zone['isHighLighted'] === true) return;
 
     // if occupied > highlight card 
@@ -143,6 +132,8 @@ export function addHighLight(scene: Scene, zone: GameObjects.Zone) {
 }
 
 export function clearHighLight(zone: GameObjects.Zone) {
+    if (zone === null) return;
+
     if (zone['isHighLighted']) {
         const card = zone.getData('data');
         if (card?.isTinted) {
@@ -169,7 +160,7 @@ export function determineZoneType(zoneName: string) {
     }
 }
 
-function createRectangle(scene: Scene, pos: vector2, width, height) {
+export function createRectangle(scene: Scene, pos: vector2, width, height) {
     const graphics = scene.add.graphics();
     graphics.setDepth(9);
     graphics.lineStyle(5, 0xff00ff);
@@ -201,4 +192,98 @@ export function enableZoneDebugInput(context: Scene, zone: Phaser.GameObjects.Zo
       },
       this
     );
+}
+
+export function createDragNDropArea(scene: Scene, cardWidth:number, cardHeight:number) {
+    const centerX = scene.cameras.main.centerX;
+    // const centerY = scene.cameras.main.centerY;
+
+    const topPlatform = PhaserHelpers.addRectangle(ShapeSettings.Rectangle_top, scene);
+    const bottomPlatform = PhaserHelpers.addRectangle(ShapeSettings.Rectangle_bottom, scene);
+
+    topPlatform.setPosition(centerX, scene.game.canvas.height - 500);
+    bottomPlatform.setPosition(centerX, scene.game.canvas.height - 350);
+
+    // todo fix later
+    if (scene.sys.game.device.os.android || scene.sys.game.device.os.iOS) {
+        topPlatform.y -= 200;
+        bottomPlatform.y -= 200;
+    }
+
+    const topStartX = topPlatform.x + cardWidth / 2 - topPlatform.width / 2;
+    const topStartY = topPlatform.y + cardHeight / 2 - topPlatform.height / 2;
+
+    const bottomStartX = bottomPlatform.x + cardWidth / 2 - bottomPlatform.width / 2;
+    const bottomStartY = bottomPlatform.y + cardHeight / 2 - bottomPlatform.height / 2;
+
+    const zoneTop = [];
+    const zoneBottom = [];
+    const zoneList = [];
+
+    for (let i = 0; i < Math.round(topPlatform.width / cardWidth); i++) {
+        const zone = createDropZone(scene, { x: topStartX + i * cardWidth, y: topStartY }, true);
+        zone.setName(`zone_top_${i}`);
+        zone.setData("isOccupied", false);
+        zoneTop.push(zone);
+        zoneList.push(zone);
+        // debug
+        enableZoneDebugInput(scene, zone);
+    }
+
+    for (let i = 0; i < Math.round(bottomPlatform.width / cardWidth); i++) {
+        const zone = createDropZone(scene, { x: bottomStartX + i * cardWidth, y: bottomStartY }, true);
+        zone.setName(`zone_bottom_${i}`);
+        zone.setData("isOccupied", false);
+        zoneBottom.push(zone);
+        zoneList.push(zone);
+        // debug
+        enableZoneDebugInput(scene, zone);
+    }
+
+    // Return the created zones or other necessary data if needed
+    return { top: zoneTop, bottom: zoneBottom, list: zoneList };
+}
+  
+export function createContainer(scene: Scene, width: number, height: number, debugFill?: boolean): Phaser.GameObjects.Container {
+    const container = scene.add?.container(0, 0);
+    // container.setDepth(100);
+    container.setSize(width, height);
+
+    if (debugFill) {
+        const rect = new Phaser.Geom.Rectangle(-width / 2, -height / 2, width, height);
+        const graphics = scene.add.graphics();
+        graphics.fillRectShape(rect).fillStyle(0xfffff);
+        graphics.setName('mask');
+        container.add(graphics);
+    }
+    return container;
+}
+
+
+export function getCardsNamesFromZone(zones) {
+    const cards = [];
+    zones.forEach(zone => {
+        if (zone.getData('data')) {
+            cards.push(zone.getData('data').name);
+        }
+    });
+    return cards;
+}
+
+export function getCardsFromZone(zones) {
+    const cards = [];
+    zones.forEach(zone => {
+        if (zone.getData('data')) {
+            cards.push(zone.getData('data'));
+        }
+    });
+    return cards;
+}
+
+export function getCardsNames(cards) {
+    const names = [];
+    cards.forEach(card => {
+        names.push(card.name);
+    });
+    return names;
 }
