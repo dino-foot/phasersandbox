@@ -184,6 +184,7 @@ export class OkeyScene extends Phaser.Scene {
             this.addRectAroundContainer(container);
           });
         }
+        this.groupDragging = false;
         break;
       case "drag":
         this.groupDragging = true;
@@ -240,9 +241,9 @@ export class OkeyScene extends Phaser.Scene {
           //? check group here 
           const groupedCards = this.getGroupedCards(this.targetDropZone);
           console.log('end', groupedCards);
-
+          // todo get the zones for those cards > on start draging emptty the zone
           _.each(groupedCards, (list, key) => {
-            console.log(`Key: ${key}, Value: ${list.length}`);
+            // console.log(`Key: ${key}, Value: ${list.length}`);
             if (list.length >= 3) {
               this.createGroupedContainer(list);
             }
