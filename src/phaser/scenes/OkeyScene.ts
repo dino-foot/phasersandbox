@@ -61,7 +61,12 @@ export class OkeyScene extends Phaser.Scene {
     //? ------- add drag events ------
     this.input.on('drop', (pointer, gameObject, dropZone) => {
       // console.log('drop ', dropZone.name);
-      this.handleDragEvents('drop', pointer, gameObject, null, null, dropZone);
+      if (gameObject.type === 'Container') {
+        this.handleGroupDranNDrop('drop', gameObject, null, null, dropZone);
+      }
+      else { 
+        this.handleDragEvents('drop', pointer, gameObject, null, null, dropZone); 
+      }
     });
 
     this.input.on('dragend', (pointer, gameObject, dropped) => {
@@ -301,18 +306,14 @@ export class OkeyScene extends Phaser.Scene {
     container.on('pointerover', (pointer, localX, localY, evnt) => { this.handleGroupDranNDrop('pointerover', container) }, this);
     container.on('pointerout', (pointer, localX, localY, evnt) => { this.handleGroupDranNDrop('pointerout', container) }, this);
     container.on("drag", (pointer, dragX, dragY) => { this.handleGroupDranNDrop('drag', container, dragX, dragY) });
-
-    this.input.on('drop', (pointer, container, dropZone) => {
-      // console.log('drop ', dropZone.name);
-      this.handleGroupDranNDrop('drop', container, null, null, dropZone);
+    
+    container.on("dragstart", (pointer, dragX, dragY) => {
+      this.handleGroupDranNDrop("dragstart", container, dragX, dragY);
     });
 
     // add highlight 
-    const containerBounds = container.input.hitArea;
-    const rect = createRectangle(this, { x: container.x, y: container.y }, containerBounds.width, containerBounds.height);
-    container['rect'] = rect;
-    
-    addGlow(this, [rect], 0x33FF93, 350, 2);
+    addGlow(this, [this.addRectAroundContainer(container)], 0x33FF93, 350, 1);
+
     this.addCardsToContainer(cardList, container);
 
   }
@@ -356,6 +357,13 @@ export class OkeyScene extends Phaser.Scene {
       card.input.enabled = false;
       container.add(card);
     });
+  }
+
+  addRectAroundContainer(container) {
+    const containerBounds = container.input.hitArea;
+    const rect = createRectangle(this, { x: container.x, y: container.y }, containerBounds.width, containerBounds.height);
+    container['rect'] = rect;
+    return rect;
   }
 
   getTargetZoneList(dropZone) {
