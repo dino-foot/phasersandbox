@@ -162,23 +162,27 @@ export class OkeyScene extends Phaser.Scene {
     switch (event) {
       case "pointerover":
         // console.log(container);
-        // container['dragIcon']?.setVisible(true);
+        Display.Align.In.TopRight(container['dragIcon'], container, 20, 25);
+        container['dragIcon']?.setVisible(true);
         _.forEach(container.getAll(), (child, index) => {
           child.setAlpha(0.6);
         });
         break;
       case "pointerout":
-        // container['dragIcon']?.setVisible(false);
+        container['dragIcon']?.setVisible(false);
         _.forEach(container.getAll(), (child, index) => {
           child.setAlpha(1);
         });
         break;
       case "dragstart":
-        container['rect']?.setVisible(false);
+        container['rect']?.destroy();
+        container['dragIcon']?.setVisible(false);
         break;
       case 'dragend':
         if (!dropped) {
-          this.handleInvalidZone(container);
+          this.handleInvalidZone(container, () => {
+            this.addRectAroundContainer(container);
+          });
         }
         break;
       case "drag":
@@ -204,6 +208,7 @@ export class OkeyScene extends Phaser.Scene {
 
           container.setPosition(dropZone.x, dropZone.y);
           this.addCardsToContainer(cards, container);
+          this.addRectAroundContainer(container);
         }
         else {
           this.handleInvalidZone(container);
@@ -318,8 +323,8 @@ export class OkeyScene extends Phaser.Scene {
 
   }
 
-  handleInvalidZone(gameObject) {
-    tweenPosition(this, gameObject, { x: gameObject.input.dragStartX, y: gameObject.input.dragStartY });
+  handleInvalidZone(gameObject, tweenCompleteCallback?) {
+    tweenPosition(this, gameObject, { x: gameObject.input.dragStartX, y: gameObject.input.dragStartY }, null, tweenCompleteCallback);
     this.resetZone();
   }
 
