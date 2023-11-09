@@ -1,5 +1,5 @@
 import Phaser, { Input } from 'phaser';
-import { GameObjects, Scene } from 'phaser';
+import { GameObjects, Scene, Display } from 'phaser';
 import _ from 'lodash';
 import {
   PhaserHelpers, addHighLight, clearHighLight, determineZoneType, getAdjacentOccupiedZones, okeyDealingTween, shiftLeftDirection, shiftRightDirection,
@@ -143,40 +143,41 @@ export class OkeyScene extends Phaser.Scene {
   }
 
 
-  handleGroupDranNDrop(event: 'pointerover' | 'pointerout' | 'drag' | 'drop', group: any | GameObjects.Container, dragX?, dragY?, dropZone?) {
+  handleGroupDranNDrop(event: 'pointerover' | 'pointerout' | 'drag' | 'drop', container: any | GameObjects.Container, dragX?, dragY?, dropZone?) {
     switch (event) {
       case "pointerover":
-        group.dragIcon?.setVisible(true);
-        _.forEach(group.container.getAll(), (child, index) => {
+        // console.log(container);
+        container['dragIcon']?.setVisible(true);
+        _.forEach(container.getAll(), (child, index) => {
           child.setAlpha(0.6);
         });
         break;
       case "pointerout":
-        group.dragIcon?.setVisible(false);
-        _.forEach(group.container.getAll(), (child, index) => {
+        container['dragIcon']?.setVisible(false);
+        _.forEach(container.getAll(), (child, index) => {
           child.setAlpha(1);
         });
         break;
       case "drag":
-        Phaser.Display.Align.In.TopRight(group.dragIcon,  group.container, 20, 25);
-        group.dragIcon?.setVisible(false);
-        group.container.setPosition(dragX, dragY);
-        group.rect.setPosition(dragX, dragY);
+        // Phaser.Display.Align.In.TopRight(group.dragIcon,  group.container, 20, 25);
+        // group.dragIcon?.setVisible(false);
+        // group.container.setPosition(dragX, dragY);
+        // group.rect.setPosition(dragX, dragY);
         break;
       case "drop":
         // high light 
-        const zoneList = this.getTargetZoneList(dropZone);
-        const index = this.getZoneIndex(dropZone);
-        const size = Math.round(group.getAll().length / 2);
+        // const zoneList = this.getTargetZoneList(dropZone);
+        // const index = this.getZoneIndex(dropZone);
+        // const size = Math.round(group.getAll().length / 2);
 
-        const startIndex = Math.max(index - size, 0);
-        const rightSlice = _.slice(zoneList, index, index + size);
-        const leftSlice = _.slice(zoneList, startIndex, index);
+        // const startIndex = Math.max(index - size, 0);
+        // const rightSlice = _.slice(zoneList, index, index + size);
+        // const leftSlice = _.slice(zoneList, startIndex, index);
 
-        const listToSearch = leftSlice.concat(rightSlice);
-        console.log('list to search ', listToSearch, zoneList[index].name, size);
+        // const listToSearch = leftSlice.concat(rightSlice);
+        // console.log('list to search ', listToSearch, zoneList[index].name, size);
 
-        group.setPosition(dropZone.x, dropZone.y);
+        // group.setPosition(dropZone.x, dropZone.y);
         break;
     }
   }
@@ -196,6 +197,18 @@ export class OkeyScene extends Phaser.Scene {
         gameObject.depth -= 1;
         if (!dropped) {
           this.handleInvalidZone(gameObject);
+        }
+        else{
+          //? check group here 
+          const groupedCards = this.getGroupedCards(this.targetDropZone);
+          console.log('end', groupedCards);
+
+          _.each(groupedCards, (list, key) => {
+            console.log(`Key: ${key}, Value: ${list.length}`);
+            if (list.length >= 3) {
+              this.createGroupedContainer(list);
+            }
+          });
         }
         break;
       case "dragstart":
@@ -243,6 +256,46 @@ export class OkeyScene extends Phaser.Scene {
     
   }
 
+  createGroupedContainer(cardList: GameObjects.Image[]) {
+    if (cardList.length < 3) return
+
+    const firstCard = cardList[0];
+    const container = createContainer(this, this.cardWidth * cardList.length, this.cardHeight, false)
+    container.setPosition(firstCard.x + this.cardWidth, firstCard.y);
+
+    const dragIcon = this.add.image(0, 0, 'plus-icon').setName('drag-icon').setScale(1.1).setDepth(11);
+    Display.Align.In.TopRight(dragIcon, container, 20, 25);
+    container['dragIcon'] = dragIcon;
+
+    // attach event 
+    container.setInteractive();
+    this.input.setDraggable(container);
+    container.on('pointerover', (pointer, localX, localY, evnt) => { this.handleGroupDranNDrop('pointerover', container) }, this);
+    container.on('pointerout', (pointer, localX, localY, evnt) => { this.handleGroupDranNDrop('pointerout', container) }, this);
+    // container.on("drag", (pointer, dragX, dragY) => {
+    //   this.handleGroupDranNDrop('drag', groupedCards[key], dragX, dragY)
+    // });
+
+    // this.input.on('drop', (pointer, container, dropZone) => {
+    //   // console.log('drop ', dropZone.name);
+    //   this.handleGroupDranNDrop('drop', container, null, null, dropZone);
+    // });
+
+    // add highlight 
+    const containerBounds = container.input.hitArea;
+    const rect = createRectangle(this, { x: container.x, y: container.y }, containerBounds.width, containerBounds.height);
+    container['rect'] = rect;
+    
+    addGlow(this, [rect], 0x33FF93, 350, 2);
+    _.forEach(cardList, (card, index) => {
+      card?.setPosition((index - 1) * this.cardWidth, 0);
+      card?.setAlpha(0.8);
+      card.input.enabled = false;
+      container.add(card);
+    });
+
+  }
+
   handleInvalidZone(gameObject) {
     tweenPosition(this, gameObject, { x: gameObject.input.dragStartX, y: gameObject.input.dragStartY });
     this.resetZone();
@@ -263,7 +316,16 @@ export class OkeyScene extends Phaser.Scene {
     this.lastDropZone?.setData("isOccupied", false);
     this.lastDropZone?.setData("data", null);
     this.lastDropZone = null;
-    this.targetDropZone = null;
+    // this.targetDropZone = null;
+  }
+
+  getGroupedCards(dropZone) {
+    if (dropZone === null) return;
+
+    const zoneList = this.getTargetZoneList(dropZone);
+    const adjacentCards = getAdjacentCards(zoneList, dropZone);
+    const groupedCards = getGroupedCards(adjacentCards);
+    return groupedCards;
   }
 
   getTargetZoneList(dropZone) {
