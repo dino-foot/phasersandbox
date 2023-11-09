@@ -65,7 +65,12 @@ export class OkeyScene extends Phaser.Scene {
     });
 
     this.input.on('dragend', (pointer, gameObject, dropped) => {
-      this.handleDragEvents('dragend', pointer, gameObject, null, null, null, dropped);
+      // console.log('dragend', gameObject); //type = "Container"
+      if (gameObject.type === 'Container') {
+        this.handleGroupDranNDrop('dragend', gameObject, null, null, null, dropped);
+      } else {
+        this.handleDragEvents('dragend', pointer, gameObject, null, null, null, dropped);
+      }
     });
 
     this.input.on("dragenter", (pointer, gameObject, dropZone) => {
@@ -73,6 +78,8 @@ export class OkeyScene extends Phaser.Scene {
       if (this.lastDropZone === null) {
         this.lastDropZone = this.targetDropZone;
       }
+
+      if (this.groupDragging) return;
       if (this.lastDropZone && this.lastDropZone !== this.targetDropZone) {
         addHighLight(this, dropZone);
       }
@@ -144,20 +151,30 @@ export class OkeyScene extends Phaser.Scene {
   }
 
 
-  handleGroupDranNDrop(event: 'pointerover' | 'pointerout' | 'drag' | 'drop', container: any | GameObjects.Container, dragX?, dragY?, dropZone?) {
+  handleGroupDranNDrop(event: 'pointerover' | 'pointerout' | 'drag' | 'dragstart' | 'dragend' | 'drop', container: GameObjects.Container,
+    dragX?, dragY?, dropZone?, dropped?: boolean) {
+
     switch (event) {
       case "pointerover":
         // console.log(container);
-        container['dragIcon']?.setVisible(true);
+        // container['dragIcon']?.setVisible(true);
         _.forEach(container.getAll(), (child, index) => {
           child.setAlpha(0.6);
         });
         break;
       case "pointerout":
-        container['dragIcon']?.setVisible(false);
+        // container['dragIcon']?.setVisible(false);
         _.forEach(container.getAll(), (child, index) => {
           child.setAlpha(1);
         });
+        break;
+      case "dragstart":
+        container['rect']?.setVisible(false);
+        break;
+      case 'dragend':
+        if (!dropped) {
+          this.handleInvalidZone(container);
+        }
         break;
       case "drag":
         this.groupDragging = true;
@@ -167,13 +184,21 @@ export class OkeyScene extends Phaser.Scene {
         const zoneList = this.getTargetZoneList(dropZone);
         const middle = this.getZoneIndex(dropZone);
 
-        const indexAfterIsEmpty = middle < zoneList.length - 1 && zoneList[middle + 1].getData('isOccupied') === false;
-        const indexBeforeIsEmpty = middle > 0 && zoneList[middle - 1].getData('isOccupied') === false;
+        const endIndex = middle < zoneList.length - 1 && zoneList[middle + 1].getData('isOccupied') === false;
+        const startIndex = middle > 0 && zoneList[middle - 1].getData('isOccupied') === false;
         const middleIsEmpty = zoneList[middle].getData('isOccupied') === false;
 
-        if (indexBeforeIsEmpty && middleIsEmpty && indexAfterIsEmpty) {
-          console.log('found empty');
+        if (startIndex && middleIsEmpty && endIndex) {
+          console.log('found 3 empty');
+          const cards = container.getAll();
+          container.removeAll();
+
+          this.assignToZone(cards[0], zoneList[middle - 1]);
+          this.assignToZone(cards[1], zoneList[middle]);
+          this.assignToZone(cards[2], zoneList[middle + 1]);
+
           container.setPosition(dropZone.x, dropZone.y);
+          this.addCardsToContainer(cards, container);
         }
         else {
           this.handleInvalidZone(container);
@@ -185,7 +210,8 @@ export class OkeyScene extends Phaser.Scene {
   handleDragEvents(event: "drag" | "dragstart" | "drop" | "dragend", pointer: Input.Pointer, gameObject, dragX?: number, dragY?: number,
     dropZone?: GameObjects.Zone, dropped?: boolean) {
 
-    if(this.groupDragging) return;
+    // when group dragging enabled disable individual dragging 
+    if (this.groupDragging) return;
 
     switch (event) {
       case "drag":
@@ -228,7 +254,7 @@ export class OkeyScene extends Phaser.Scene {
         else {
           // occupied zone
           // this.handleInvalidZone(gameObject);
-          console.log('occupied zone 0');
+          // console.log('occupied zone 0');
           this.handleShifting(gameObject, dropZone);
         }
         break;
@@ -287,12 +313,7 @@ export class OkeyScene extends Phaser.Scene {
     container['rect'] = rect;
     
     addGlow(this, [rect], 0x33FF93, 350, 2);
-    _.forEach(cardList, (card, index) => {
-      card?.setPosition((index - 1) * this.cardWidth, 0);
-      card?.setAlpha(0.8);
-      card.input.enabled = false;
-      container.add(card);
-    });
+    this.addCardsToContainer(cardList, container);
 
   }
 
@@ -326,6 +347,15 @@ export class OkeyScene extends Phaser.Scene {
     const adjacentCards = getAdjacentCards(zoneList, dropZone);
     const groupedCards = getGroupedCards(adjacentCards);
     return groupedCards;
+  }
+
+  addCardsToContainer(cards, container) {
+    _.forEach(cards, (card, index) => {
+      card?.setPosition((index - 1) * this.cardWidth, 0);
+      card?.setAlpha(0.8);
+      card.input.enabled = false;
+      container.add(card);
+    });
   }
 
   getTargetZoneList(dropZone) {
