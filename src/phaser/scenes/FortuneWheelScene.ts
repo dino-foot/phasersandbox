@@ -84,7 +84,6 @@ export class FortuneWheelScene extends Scene {
         this.wheel = this.add.sprite(this.cameras.main.centerX, this.cameras.main.centerY, "wheel");
 
         const anglePerSlice = (2 * Math.PI) / this.wheelSettings.slices;
-        
         for (let i = 0; i < this.wheelSettings.slicePrizes.length; i++) {
             const angle = i * anglePerSlice + anglePerSlice / 2; 
             const x = this.wheel.x + Math.cos(angle) * (this.wheelSettings.wheelRadius - 50); 
@@ -96,9 +95,13 @@ export class FortuneWheelScene extends Scene {
             text.setOrigin(0.5);
         }
 
+        const pin = this.add.image(this.wheel.x, this.wheel.y - this.wheel.y/1.75, 'pin').setOrigin(0.5).setDepth(3);
+        pin.setScale(1.5);
+
         this.input.on("pointerdown", this.spinWheel, this);
     }
 
+    // https://labs.phaser.io/edit.html?src=src\game%20objects\rope\single%20alpha%20rope.js
     spinWheel() {
 
         if (this.isSpinning) return;
@@ -116,5 +119,6 @@ export class FortuneWheelScene extends Scene {
                 this.isSpinning = false;
             }
         });
+        
     }
 }
