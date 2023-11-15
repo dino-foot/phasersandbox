@@ -1,4 +1,6 @@
 import { GameObjects, Scene } from "phaser";
+import { PhaserHelpers, moneyWinEffects, tweenPosition } from "../helpers";
+import { TextSettings } from "../settings/TextSettings";
 
 export class FortuneWheelScene extends Scene {
     wheelSettings = {
@@ -36,7 +38,8 @@ export class FortuneWheelScene extends Scene {
     };
     wheel: GameObjects.Sprite
     isSpinning: boolean
-
+    winText: GameObjects.Text;
+    winAmount = 0;
     constructor() {
         super('fortune-wheel');
     }
@@ -45,9 +48,9 @@ export class FortuneWheelScene extends Scene {
         console.log('fortune-wheel');
         const centerX = this.cameras.main.centerX;
         const centerY = this.cameras.main.centerY;
-
+        this.winAmount = 0;
         this.add.image(centerX, centerY + 250, 'bg').setOrigin(0.5).setOrigin(0.5).setScale(3);
-
+        this.winText = PhaserHelpers.addText(TextSettings.WIN, this);
     }
 
     create() {
@@ -85,17 +88,17 @@ export class FortuneWheelScene extends Scene {
 
         const anglePerSlice = (2 * Math.PI) / this.wheelSettings.slices;
         for (let i = 0; i < this.wheelSettings.slicePrizes.length; i++) {
-            const angle = i * anglePerSlice + anglePerSlice / 2; 
-            const x = this.wheel.x + Math.cos(angle) * (this.wheelSettings.wheelRadius - 50); 
+            const angle = i * anglePerSlice + anglePerSlice / 2;
+            const x = this.wheel.x + Math.cos(angle) * (this.wheelSettings.wheelRadius - 50);
             const y = this.wheel.y + Math.sin(angle) * (this.wheelSettings.wheelRadius - 50);
             // console.log('angle ', angle)
 
-            const text = this.add.text(x , y, this.wheelSettings.slicePrizes[i], { fontSize: '34px' }).setDepth(1);
+            const text = this.add.text(x, y, this.wheelSettings.slicePrizes[i], { fontSize: '34px' }).setDepth(1);
             text.setRotation(angle + Math.PI / 2);
             text.setOrigin(0.5);
         }
 
-        const pin = this.add.image(this.wheel.x, this.wheel.y - this.wheel.y/1.75, 'pin').setOrigin(0.5).setDepth(3);
+        const pin = this.add.image(this.wheel.x, this.wheel.y - this.wheel.y / 1.75, 'pin').setOrigin(0.5).setDepth(3);
         pin.setScale(1.5);
 
         this.input.on("pointerdown", this.spinWheel, this);
@@ -117,8 +120,12 @@ export class FortuneWheelScene extends Scene {
             ease: Phaser.Math.Easing.Sine.InOut,
             onComplete: () => {
                 this.isSpinning = false;
+                const emitter = moneyWinEffects(this, { x: this.wheel.x, y: this.wheel.y });
+                tweenPosition(this, emitter, { x: this.winText.x, y: this.winText.y }, { scale: 0, alpha: 0, duration: 1000, delay: 1600 });
+                this.winAmount += 10;
+                this.winText.setText(`WIN: ${this.winAmount}$`);
             }
         });
-        
+
     }
 }

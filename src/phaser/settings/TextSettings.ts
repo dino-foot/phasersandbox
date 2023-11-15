@@ -7,6 +7,7 @@ interface TextSettingsInterface {
   SCOPA_FX: TextObject;
   DEAL_CARDS: TextObject;
   CARD_MATCH: TextObject;
+  WIN: TextObject;
 }
 
 const createTextSettings = (text, x, y) => {
@@ -35,4 +36,5 @@ export const TextSettings: TextSettingsInterface = {
   SCOPA_FX: createTextSettings('SCOPA_FX', 700, 50),
   DEAL_CARDS: createTextSettings('DEAL CARDS', 900, 50),
   CARD_MATCH: createTextSettings('CARD_MATCH', 1100, 50),
+  WIN: createTextSettings('WIN: 00$', 1100, 50),
 };
