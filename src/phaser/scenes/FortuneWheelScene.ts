@@ -87,6 +87,7 @@ export class FortuneWheelScene extends Scene {
         this.wheel = this.add.sprite(this.cameras.main.centerX, this.cameras.main.centerY, "wheel");
 
         const anglePerSlice = (2 * Math.PI) / this.wheelSettings.slices;
+
         for (let i = 0; i < this.wheelSettings.slicePrizes.length; i++) {
             const angle = i * anglePerSlice + anglePerSlice / 2;
             const x = this.wheel.x + Math.cos(angle) * (this.wheelSettings.wheelRadius - 50);
@@ -94,6 +95,7 @@ export class FortuneWheelScene extends Scene {
             // console.log('angle ', angle)
 
             const text = this.add.text(x, y, this.wheelSettings.slicePrizes[i], { fontSize: '34px' }).setDepth(1);
+        
             text.setRotation(angle + Math.PI / 2);
             text.setOrigin(0.5);
         }
@@ -112,6 +114,7 @@ export class FortuneWheelScene extends Scene {
         this.isSpinning = true;
         const rounds = Phaser.Math.Between(2, 8);
         const degrees = Phaser.Math.Between(0, 360);
+       
 
         this.tweens.add({
             targets: this.wheel,
@@ -120,7 +123,7 @@ export class FortuneWheelScene extends Scene {
             ease: Phaser.Math.Easing.Sine.InOut,
             onComplete: () => {
                 this.isSpinning = false;
-                const emitter = moneyWinEffects(this, { x: this.wheel.x, y: this.wheel.y });
+                const emitter = moneyWinEffects(this, { x: this.wheel.x- 20, y: this.wheel.y - 20 });
                 tweenPosition(this, emitter, { x: this.winText.x, y: this.winText.y }, { scale: 0, alpha: 0, duration: 1000, delay: 1600 });
                 this.winAmount += 10;
                 this.winText.setText(`WIN: ${this.winAmount}$`);
