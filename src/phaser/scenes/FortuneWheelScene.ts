@@ -1,4 +1,4 @@
-import { GameObjects, Scene } from "phaser";
+import { Display, GameObjects, Scene } from "phaser";
 import { PhaserHelpers, moneyWinEffects, tweenPosition } from "../helpers";
 import { TextSettings } from "../settings/TextSettings";
 
@@ -6,7 +6,7 @@ export class FortuneWheelScene extends Scene {
     wheelSettings = {
         slices: 12,
         sliceColors: [0xffd28f, 0xa2c579, 0xd2de32, 0x61a3ba, 0x83a2ff, 0xff6c22, 0xe9b824, 0xb4bdff, 0xff4b91, 0xff7676, 0xffcd4b, 0x22a699],
-        slicePrizes: [10, 2, 1, 3, 20, 5, 100, 4, 5, 1, 2, 5],
+        slicePrizes: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
         rotationTime: 3000,
         wheelRadius: 300,
     };
@@ -71,6 +71,7 @@ export class FortuneWheelScene extends Scene {
         const textList = [];
         for (let i = 0; i < this.wheelSettings.slicePrizes.length; i++) {
             const angle = i * anglePerSlice + anglePerSlice / 2;
+            // console.log('angle ', angle);
             const x = this.wheel.x + Math.cos(angle) * (this.wheelSettings.wheelRadius - 50);
             const y = this.wheel.y + Math.sin(angle) * (this.wheelSettings.wheelRadius - 50);
             // console.log('angle ', angle)
@@ -81,11 +82,11 @@ export class FortuneWheelScene extends Scene {
         }
         this.wheelContainer.add(textList);
 
-        const pin = this.add
-            .image(this.wheelContainer.x, this.wheelContainer.y - this.wheelContainer.y / 1.75, "pin")
-            .setOrigin(0.5)
-            .setDepth(3);
+        const pin = this.add.image(0, 0, "pin").setOrigin(0.5).setDepth(3);
         pin.setScale(1.5);
+        Display.Align.In.Center(pin, this.wheelContainer, 20);
+        pin.setAngle(-90);
+        pin.flipX = true;
 
         this.input.on("pointerdown", this.spinWheel, this);
     }
@@ -109,12 +110,17 @@ export class FortuneWheelScene extends Scene {
                 tweenPosition(this, emitter, { x: this.winText.x, y: this.winText.y }, { scale: 0, alpha: 0, duration: 1000, delay: 1600 });
 
                 let prizeIndex = this.getPrize(degrees);
-                if (prizeIndex > 3) prizeIndex -= 3;
+                console.log(`index ${prizeIndex} prize ${this.wheelSettings.slicePrizes[prizeIndex]}$`);
 
                 this.winAmount += this.wheelSettings.slicePrizes[prizeIndex];
                 this.winText.setText(`WIN: ${this.winAmount}$`);
-                
-                console.log(`index ${prizeIndex} prize ${this.wheelSettings.slicePrizes[prizeIndex]}$`);
+
+                const text = this.add.text(0, 0, `${this.wheelSettings.slicePrizes[prizeIndex]}$`, { fontSize: "50px"});
+                text.setStroke('#111111', 6);
+                text.setAlpha(1);
+                text.setDepth(10);
+                Display.Align.In.Center(text, this.wheelContainer, 0, 20);
+                tweenPosition(this, text,  { x: this.winText.x, y: this.winText.y }, { alpha: 0, duration: 2000, delay: 500 })
             },
         });
     }
