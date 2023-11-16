@@ -6,7 +6,7 @@ export class FortuneWheelScene extends Scene {
     wheelSettings = {
         slices: 12,
         sliceColors: [0xffd28f, 0xa2c579, 0xd2de32, 0x61a3ba, 0x83a2ff, 0xff6c22, 0xe9b824, 0xb4bdff, 0xff4b91, 0xff7676, 0xffcd4b, 0x22a699],
-        slicePrizes: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        slicePrizes: [0, 5, 1, 2, 5, 100, 2, 10, 5, 50, 0, 1],
         rotationTime: 3000,
         wheelRadius: 300,
     };
