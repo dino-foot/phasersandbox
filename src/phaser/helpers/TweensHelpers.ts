@@ -13,7 +13,7 @@ export const shuffleCards_A = (context: Scene, cardList: Card[], pos: vector2, c
         targets: cardList,
         x: (a, b, c, d) => pos.x + 85 * d,
         y: pos.y,
-        duration: 500,
+        duration: 900,
         angle: { from: 180, to: 0 },
         delay: context.tweens.stagger(100, { start: 0 }),
         ease: Phaser.Math.Easing.Sine.Out,

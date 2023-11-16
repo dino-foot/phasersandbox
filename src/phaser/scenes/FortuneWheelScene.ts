@@ -109,18 +109,7 @@ export class FortuneWheelScene extends Scene {
                 const emitter = moneyWinEffects(this, { x: this.wheelContainer.x - 20, y: this.wheelContainer.y - 20 });
                 tweenPosition(this, emitter, { x: this.winText.x, y: this.winText.y }, { scale: 0, alpha: 0, duration: 1000, delay: 1600 });
 
-                let prizeIndex = this.getPrize(degrees);
-                console.log(`index ${prizeIndex} prize ${this.wheelSettings.slicePrizes[prizeIndex]}$`);
-
-                this.winAmount += this.wheelSettings.slicePrizes[prizeIndex];
-                this.winText.setText(`WIN: ${this.winAmount}$`);
-
-                const text = this.add.text(0, 0, `${this.wheelSettings.slicePrizes[prizeIndex]}$`, { fontSize: "50px"});
-                text.setStroke('#111111', 6);
-                text.setAlpha(1);
-                text.setDepth(10);
-                Display.Align.In.Center(text, this.wheelContainer, 0, 20);
-                tweenPosition(this, text,  { x: this.winText.x, y: this.winText.y }, { alpha: 0, duration: 2000, delay: 500 })
+                this.winTextAnim(degrees);
             },
         });
     }
@@ -128,5 +117,22 @@ export class FortuneWheelScene extends Scene {
     getPrize(degrees: number) {
         const prizeIndex = this.wheelSettings.slices - 1 - Math.floor(degrees / (360 / this.wheelSettings.slices));
         return prizeIndex;
+    }
+
+    winTextAnim(degrees: number) {
+        let prizeIndex = this.getPrize(degrees);
+        console.log(`index ${prizeIndex} prize ${this.wheelSettings.slicePrizes[prizeIndex]}$`);
+
+        this.winAmount += this.wheelSettings.slicePrizes[prizeIndex];
+
+        const text = this.add.text(0, 0, `${this.wheelSettings.slicePrizes[prizeIndex]}$`, { fontSize: "50px" });
+        text.setStroke('#111111', 6);
+        text.setAlpha(1);
+        text.setDepth(10);
+        Display.Align.In.Center(text, this.wheelContainer, 0, 20);
+        tweenPosition(this, text, { x: this.winText.x, y: this.winText.y }, { alpha: 0, duration: 1500, delay: 250 }, () => {
+            this.winText.setText(`WIN: ${this.winAmount}$`);
+            text.destroy();
+        });
     }
 }
