@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 import config from './PhaserGame';
-import { PreloadScene, ScopaScene, OkeyScene } from './phaser/scenes';
+import { PreloadScene, ScopaScene, OkeyScene, FortuneWheelScene } from './phaser/scenes';
 
 interface Room {
   id: number;
@@ -11,7 +11,7 @@ interface Room {
 const rooms: Room[] = [
   { id: 1, name: 'Scopa' },
   { id: 2, name: 'Okey' },
-  // { id: 3, name: 'Slot' },
+  { id: 3, name: 'FortuneWheel' },
   // { id: 5, name: 'Call Break' },
   // { id: 6, name: 'Ludo' },
 ];
@@ -33,6 +33,7 @@ function App() {
       const scenes = {
         Scopa: ScopaScene,
         Okey: OkeyScene,
+        FortuneWheel: FortuneWheelScene
       };
 
       const gameConfig = {

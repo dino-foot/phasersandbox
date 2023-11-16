@@ -19,6 +19,8 @@ export const LoadSettings: LoadSettings = {
     { key: 'avatar2', path: `${rootPath}/ui` },
     { key: 'plus-icon', path: `${rootPath}/ui` },
     { key: 'scopa-fx', path: `${rootPath}/effects` },
+    { key: 'pin', path: `${rootPath}/ui` },
+    { key: 'money', path: `${rootPath}/ui` },
   ],
 
   spritesheets: [
