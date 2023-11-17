@@ -15,8 +15,8 @@ export const confettiEffects = (scene: Scene, posFromEmit: vector2): GameObjects
     gravityY: 200,
     emitting: true,
     stopAfter: 200,
-    duration: 1000,
-    quantity: 4,
+    duration: 2000,
+    quantity: 3,
   };
 
   emitter.setConfig(config);
